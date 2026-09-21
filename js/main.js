@@ -64,7 +64,6 @@ function updateContactReveal(){
 
   if(!desktop||reducedMotion){
     contactCopy.style.transform='';
-    contactImage.style.transform='';
     return;
   }
 
@@ -74,8 +73,7 @@ function updateContactReveal(){
   const raw=Math.min(1,Math.max(0,(start-rect.top)/Math.max(1,start-end)));
   const p=raw*raw*(3-2*raw);
 
-  contactCopy.style.transform='translateX('+(-105*(1-p)).toFixed(2)+'%)';
-  contactImage.style.transform='scale('+(1.025-.025*p).toFixed(4)+')';
+  contactCopy.style.transform='translateX('+(-102*(1-p)).toFixed(2)+'%)';
 }
 
 addEventListener('scroll',updateContactReveal,{passive:true});
