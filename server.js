@@ -114,14 +114,15 @@ async function handlePvgis(reqUrl,res){
   const lat=Number(reqUrl.searchParams.get('lat'));
   const lon=Number(reqUrl.searchParams.get('lon'));
   const aspect=Number(reqUrl.searchParams.get('aspect'));
+  const angle=Number(reqUrl.searchParams.get('angle')||30);
 
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)||!Number.isFinite(aspect)){
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||!Number.isFinite(aspect)||!Number.isFinite(angle)){
     send(res,400,JSON.stringify({error:'Parámetros solares incompletos.'}));
     return;
   }
 
   try{
-    const cacheKey=[lat,lon,aspect].join('|');
+    const cacheKey=[lat,lon,aspect,angle].join('|');
     if(pvgisCache.has(cacheKey)){
       send(res,200,JSON.stringify(pvgisCache.get(cacheKey)));
       return;
@@ -135,7 +136,7 @@ async function handlePvgis(reqUrl,res){
       pvcalculation:1,
       peakpower:1,
       loss:14,
-      angle:30,
+      angle,
       aspect,
       pvtechchoice:'crystSi',
       mountingplace:'building',
