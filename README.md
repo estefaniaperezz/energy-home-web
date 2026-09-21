@@ -1,4 +1,4 @@
-# NOVA Energy — Web Prototype
+# Ekinova Klima — Web
 
 Prototipo de una web moderna para una empresa de soluciones energéticas para el hogar.
 
@@ -28,7 +28,6 @@ nova-energy-github/
 ```
 
 ## Importante
-- `NOVA` es un nombre provisional.
 - Las imágenes actuales se cargan desde Unsplash y son temporales.
 - Antes de publicar la web definitiva conviene sustituirlas por recursos propios/locales y optimizados.
 - El formulario es únicamente visual por ahora.
