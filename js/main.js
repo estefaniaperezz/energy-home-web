@@ -126,10 +126,10 @@ function formatDecimal(value,digits=1){
   return new Intl.NumberFormat('es-ES',{minimumFractionDigits:digits,maximumFractionDigits:digits}).format(value);
 }
 
-function formatRange(min,max,rounder=roundFifty){
-  const a=rounder(min);
-  const b=rounder(max);
-  return a===b?formatInt(a):formatInt(a)+'–'+formatInt(b);
+function formatRange(min,max,step=50){
+  const a=Math.floor(min/step)*step;
+  const b=Math.ceil(max/step)*step;
+  return formatInt(a)+'–'+formatInt(b);
 }
 
 function daysInYear(year){
@@ -183,7 +183,40 @@ async function geocodeLocation(query){
   return result;
 }
 
-async function fetchPvgisSeries(lat,lon,aspect){
+const timeFormatters=new Map();
+
+function pvgisLocalParts(time,timezone){
+  const year=Number(time.slice(0,4));
+  const month=Number(time.slice(4,6));
+  const day=Number(time.slice(6,8));
+  const hour=Number(time.slice(9,11));
+  const minute=Number(time.slice(11,13))||0;
+  const date=new Date(Date.UTC(year,month-1,day,hour,minute));
+
+  if(!timeFormatters.has(timezone)){
+    timeFormatters.set(timezone,new Intl.DateTimeFormat('en-GB',{
+      timeZone:timezone,
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit',
+      hour:'2-digit',
+      hourCycle:'h23'
+    }));
+  }
+
+  const parts={};
+  timeFormatters.get(timezone).formatToParts(date).forEach(part=>{
+    if(part.type!=='literal') parts[part.type]=part.value;
+  });
+
+  return {
+    year:Number(parts.year),
+    month:Number(parts.month)-1,
+    hour:Number(parts.hour)
+  };
+}
+
+async function fetchPvgisSeries(lat,lon,aspect,timezone){
   const response=await fetch(
     API_BASE+'/pvgis?lat='+encodeURIComponent(lat)+
     '&lon='+encodeURIComponent(lon)+
@@ -201,28 +234,38 @@ async function fetchPvgisSeries(lat,lon,aspect){
     throw new Error('PVGIS no ha devuelto una serie horaria válida.');
   }
 
-  return hourly.map(row=>({
-    time:String(row.time),
-    P:Number(row.P)||0
-  }));
+  return hourly.map(row=>{
+    const time=String(row.time);
+    const local=pvgisLocalParts(time,timezone);
+    return {
+      time,
+      P:Number(row.P)||0,
+      localYear:local.year,
+      localMonth:local.month,
+      localHour:local.hour
+    };
+  });
 }
 
-async function getSolarSeries(lat,lon,orientation){
-  const cacheKey=[lat.toFixed(4),lon.toFixed(4),orientation].join('|');
+async function getSolarSeries(lat,lon,orientation,timezone){
+  const cacheKey=[lat.toFixed(4),lon.toFixed(4),orientation,timezone].join('|');
   if(solarCache.has(cacheKey)) return solarCache.get(cacheKey);
 
   let series;
   if(orientation==='south'){
-    series=await fetchPvgisSeries(lat,lon,0);
+    series=await fetchPvgisSeries(lat,lon,0,timezone);
   }else if(orientation==='eastwest'){
     const [east,west]=await Promise.all([
-      fetchPvgisSeries(lat,lon,-90),
-      fetchPvgisSeries(lat,lon,90)
+      fetchPvgisSeries(lat,lon,-90,timezone),
+      fetchPvgisSeries(lat,lon,90,timezone)
     ]);
     const length=Math.min(east.length,west.length);
     series=Array.from({length},(_,i)=>({
       time:east[i].time,
-      P:(east[i].P+west[i].P)/2
+      P:(east[i].P+west[i].P)/2,
+      localYear:east[i].localYear,
+      localMonth:east[i].localMonth,
+      localHour:east[i].localHour
     }));
   }else{
     throw new Error('Necesitamos una orientación calculable.');
@@ -236,7 +279,7 @@ async function getSolarSeries(lat,lon,orientation){
 function annualYieldPerKwp(series){
   const years=new Map();
   series.forEach(row=>{
-    const year=Number(row.time.slice(0,4));
+    const year=row.localYear||Number(row.time.slice(0,4));
     const value=(row.P||0)/1000;
     years.set(year,(years.get(year)||0)+value);
   });
@@ -251,9 +294,9 @@ function simulate(series,annualConsumption,peakPower,profileKey,prices){
   const years=new Map();
 
   series.forEach(row=>{
-    const year=Number(row.time.slice(0,4));
-    const month=Number(row.time.slice(4,6))-1;
-    const localHour=Number(row.time.slice(9,11));
+    const year=row.localYear;
+    const month=row.localMonth;
+    const localHour=row.localHour;
     const dailyConsumption=annualConsumption/daysInYear(year);
     const consumption=dailyConsumption*(weights[localHour]/weightSum);
     const production=((row.P||0)/1000)*peakPower;
@@ -297,7 +340,6 @@ function simulate(series,annualConsumption,peakPower,profileKey,prices){
 }
 
 function confidenceLabel(basis,shade,advanced,exactPrices){
-  if(shade==='unsure') return 'Precisión baja';
   if(basis==='bill') return 'Precisión media-baja';
   if(advanced&&exactPrices) return 'Precisión media-alta';
   return 'Precisión media';
@@ -333,8 +375,8 @@ function renderEstimate(payload){
   needsStudy.hidden=true;
   resultData.hidden=false;
 
-  document.getElementById('savingMin').textContent=formatInt(roundTen(savingLow));
-  document.getElementById('savingMax').textContent=formatInt(roundTen(savingHigh));
+  document.getElementById('savingMin').textContent=formatInt(Math.floor(savingLow/10)*10);
+  document.getElementById('savingMax').textContent=formatInt(Math.ceil(savingHigh/10)*10);
   document.getElementById('productionRange').textContent=formatRange(productionLow,productionHigh);
   document.getElementById('selfUseRange').textContent=formatRange(selfLow,selfHigh);
   document.getElementById('exportRange').textContent=formatRange(exportLow,exportHigh);
@@ -344,13 +386,22 @@ function renderEstimate(payload){
   const shortLocation=payload.location.label.split(',').slice(0,2).join(', ');
   let summary='Simulación preliminar para '+shortLocation+' con una instalación de '+formatDecimal(payload.peakPower,1)+' kWp.';
   if(payload.consumption.basis==='bill'){
-    summary+=' Como solo conocemos el importe de la factura, estimamos un consumo amplio de '+formatRange(payload.consumption.min,payload.consumption.max,roundFifty)+' kWh/año.';
+    summary+=' Como solo conocemos el importe de la factura, estimamos un consumo amplio de '+formatRange(payload.consumption.min,payload.consumption.max,50)+' kWh/año.';
   }
   document.getElementById('resultSummary').textContent=summary;
 
   let assumptions='Datos horarios de producción fotovoltaica de PVGIS '+ESTIMATOR_ASSUMPTIONS.startYear+'–'+ESTIMATOR_ASSUMPTIONS.endYear+
     ', pérdidas de sistema del '+ESTIMATOR_ASSUMPTIONS.systemLoss+' %, inclinación de referencia '+ESTIMATOR_ASSUMPTIONS.referenceTilt+
-    '° y sin batería. El perfil de consumo es aproximado.';
+    '° y sin batería. Al no disponer todavía de consumos mensuales reales, repartimos el consumo anual de forma uniforme entre los días del año y aplicamos el patrón horario elegido. La potencia mostrada es una simulación teórica dimensionada para producir aproximadamente el '+
+    Math.round(ESTIMATOR_ASSUMPTIONS.targetCoverage*100)+' % del consumo anual; no es una recomendación final de instalación.';
+
+  if(payload.orientation==='eastwest'){
+    assumptions+=' En Este-Oeste suponemos un reparto 50/50 de la potencia entre ambas orientaciones.';
+  }
+
+  if(payload.profile==='night'){
+    assumptions+=' Como has indicado consumo principalmente de tarde/noche, la potencia final debería optimizarse con datos reales para evitar sobredimensionar y generar excedentes de poco valor.';
+  }
 
   if(!payload.exactPrices){
     assumptions+=' Para convertir kWh en euros usamos un rango de referencia de '+formatDecimal(payload.prices.buy[0],2)+'–'+formatDecimal(payload.prices.buy[1],2)+
@@ -422,6 +473,15 @@ async function runSolarEstimate(options={}){
     return;
   }
 
+  if(shade==='unsure'){
+    estimatorStatus.textContent='';
+    showStudyNeeded(
+      'Antes de calcular, necesitamos confirmar las sombras.',
+      'Si no sabemos si hay árboles, edificios o chimeneas que sombreen la cubierta, el mismo número podría parecer más fiable de lo que es. Preferimos confirmar este punto antes de darte un ahorro en euros.'
+    );
+    return;
+  }
+
   let consumption;
   let prices={buy:ESTIMATOR_ASSUMPTIONS.buyPrice,exported:ESTIMATOR_ASSUMPTIONS.exportPrice};
   let exactPrices=false;
@@ -454,11 +514,12 @@ async function runSolarEstimate(options={}){
   try{
     const location=await geocodeLocation(locationQuery);
     estimatorStatus.textContent='Calculando producción y cruce horario con tu consumo…';
-    const series=await getSolarSeries(location.lat,location.lon,orientation);
+    const series=await getSolarSeries(location.lat,location.lon,orientation,location.timezone||'Europe/Madrid');
 
     const yieldPerKwp=annualYieldPerKwp(series);
     const midConsumption=(consumption.min+consumption.max)/2;
-    const peakPower=clamp(roundHalf((midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp),1.5,10);
+    const theoreticalPower=(midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp;
+    const peakPower=Math.max(.1,Math.round(theoreticalPower*10)/10);
     const candidates=consumption.min===consumption.max?[consumption.min]:[consumption.min,consumption.max];
     const scenarios=[];
     candidates.forEach(value=>{
