@@ -463,3 +463,13 @@ h1 span{color:var(--gold2)}
   .saving-breakdown{grid-template-columns:1fr}
   .form{grid-template-columns:1fr}.contact-copy{padding:32px 20px}.contact-copy h2{font-size:44px}
 }
+
+/* Keep the sticky result card from covering the expanded real-data form */
+.estimator-layout.real-data-open .estimate-result{
+  position:relative;
+  top:auto;
+  align-self:start;
+}
+.estimator-layout.real-data-open .real-data-panel{
+  margin-top:0;
+}
