@@ -366,9 +366,9 @@ function simulate(series,annualConsumption,peakPower,profileKey,prices,monthlyCo
   return results;
 }
 
-function confidenceLabel(basis,shade,advanced,exactPrices){
+function confidenceLabel(basis,advanced,exactPrices,monthlyConsumption,angleIsAssumed){
   if(basis==='bill') return 'Precisión media-baja';
-  if(advanced&&exactPrices) return 'Precisión media-alta';
+  if(advanced&&exactPrices&&monthlyConsumption&&!angleIsAssumed) return 'Precisión media-alta';
   return 'Precisión media';
 }
 
@@ -602,7 +602,13 @@ async function runSolarEstimate(options={}){
       scenarios.push(...simulate(series,value,peakPower,profile,prices,monthlyConsumption));
     });
 
-    const confidence=confidenceLabel(consumption.basis,shade,advanced,exactPrices);
+    const confidence=confidenceLabel(
+      consumption.basis,
+      advanced,
+      exactPrices,
+      monthlyConsumption,
+      advanced?roofData.angleIsAssumed:true
+    );
     renderEstimate({
       scenarios,
       peakPower,
