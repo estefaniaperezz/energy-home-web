@@ -64,6 +64,7 @@ const advancedDataFields=document.getElementById('advancedDataFields');
 const useMonthlyData=document.getElementById('useMonthlyData');
 const monthlyConsumptionGrid=document.getElementById('monthlyConsumptionGrid');
 const monthlyTotal=document.getElementById('monthlyTotal');
+const monthlyCheck=document.getElementById('monthlyCheck');
 
 const ESTIMATOR_ASSUMPTIONS={
   startYear:2019,
@@ -483,13 +484,10 @@ function getMonthlyConsumption(){
 function advancedRoofData(fallbackOrientation){
   const precise=document.getElementById('preciseOrientation');
   const tilt=document.getElementById('roofTilt');
-  const roofType=document.getElementById('roofType');
-
   return {
     orientation:precise && precise.value ? precise.value : fallbackOrientation,
     angle:tilt && tilt.value ? Number(tilt.value) : ESTIMATOR_ASSUMPTIONS.referenceTilt,
-    angleIsAssumed:!(tilt && tilt.value),
-    roofType:roofType?roofType.value:''
+    angleIsAssumed:!(tilt && tilt.value)
   };
 }
 
@@ -545,14 +543,25 @@ async function runSolarEstimate(options={}){
   let prices={buy:ESTIMATOR_ASSUMPTIONS.buyPrice,exported:ESTIMATOR_ASSUMPTIONS.exportPrice};
   let exactPrices=false;
   let monthlyConsumption=null;
-  let roofData={orientation,angle:ESTIMATOR_ASSUMPTIONS.referenceTilt,angleIsAssumed:true,roofType:''};
+  let roofData={orientation,angle:ESTIMATOR_ASSUMPTIONS.referenceTilt,angleIsAssumed:true};
 
   try{
     if(advanced){
       const real=Number(document.getElementById('realAnnualKwh').value);
       if(!Number.isFinite(real)||real<100) throw new Error('Introduce el consumo anual de tu factura.');
       monthlyConsumption=getMonthlyConsumption();
-      const realTotal=monthlyConsumption?monthlyConsumption.reduce((a,b)=>a+b,0):real;
+      let realTotal=real;
+      if(monthlyConsumption){
+        const monthlySum=monthlyConsumption.reduce((a,b)=>a+b,0);
+        const difference=Math.abs(monthlySum-real)/Math.max(real,1);
+        if(difference>.05){
+          throw new Error(
+            'Los 12 meses suman '+formatInt(monthlySum)+' kWh, pero tu consumo anual indica '+
+            formatInt(real)+' kWh. Revisa cuál de los dos datos es correcto.'
+          );
+        }
+        realTotal=monthlySum;
+      }
       consumption={min:realTotal,max:realTotal,basis:'kwh'};
       const custom=advancedPrices();
       prices={buy:custom.buy,exported:custom.exported};
@@ -617,7 +626,6 @@ async function runSolarEstimate(options={}){
       orientation:advanced?roofData.orientation:orientation,
       angle:advanced?roofData.angle:ESTIMATOR_ASSUMPTIONS.referenceTilt,
       angleIsAssumed:advanced?roofData.angleIsAssumed:true,
-      roofType:advanced?roofData.roofType:'',
       monthlyConsumption,
       profile,
       shade,
@@ -694,9 +702,40 @@ function updateMonthlyTotal(){
   const values=[...monthlyConsumptionGrid.querySelectorAll('input[data-month]')]
     .map(input=>Number(input.value)||0);
   const total=values.reduce((a,b)=>a+b,0);
-  monthlyTotal.textContent=useMonthlyData&&useMonthlyData.checked
+  const enabled=useMonthlyData&&useMonthlyData.checked;
+
+  monthlyTotal.textContent=enabled
     ? 'Total de los 12 meses: '+formatInt(total)+' kWh'
     : '';
+
+  if(!monthlyCheck){
+    return;
+  }
+
+  if(!enabled||!total){
+    monthlyCheck.textContent='';
+    monthlyCheck.classList.remove('warning','ok');
+    return;
+  }
+
+  const annual=Number(document.getElementById('realAnnualKwh').value);
+  if(!Number.isFinite(annual)||annual<=0){
+    monthlyCheck.textContent='Introduce también el consumo anual de la factura para poder comprobar los datos.';
+    monthlyCheck.classList.add('warning');
+    monthlyCheck.classList.remove('ok');
+    return;
+  }
+
+  const difference=Math.abs(total-annual)/annual;
+  if(difference<=.05){
+    monthlyCheck.textContent='Los consumos mensuales son coherentes con el total anual.';
+    monthlyCheck.classList.add('ok');
+    monthlyCheck.classList.remove('warning');
+  }else{
+    monthlyCheck.textContent='Revisa los datos: el total mensual difiere más de un 5 % del consumo anual.';
+    monthlyCheck.classList.add('warning');
+    monthlyCheck.classList.remove('ok');
+  }
 }
 
 if(useMonthlyData){
@@ -708,4 +747,10 @@ if(useMonthlyData){
 
 if(monthlyConsumptionGrid){
   monthlyConsumptionGrid.addEventListener('input',updateMonthlyTotal);
+}
+
+
+const realAnnualKwhInput=document.getElementById('realAnnualKwh');
+if(realAnnualKwhInput){
+  realAnnualKwhInput.addEventListener('input',updateMonthlyTotal);
 }
