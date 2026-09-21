@@ -589,3 +589,13 @@ h1{
   .real-form-grid{grid-template-columns:1fr}
   .monthly-grid{grid-template-columns:repeat(3,1fr)}
 }
+
+
+.monthly-check{
+  min-height:16px;
+  margin:4px 0 0;
+  font-size:10px;
+  line-height:1.4;
+}
+.monthly-check.ok{color:#c7d9b8}
+.monthly-check.warning{color:#efc579}
