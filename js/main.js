@@ -59,6 +59,7 @@ const quickBill=document.getElementById('quickBill');
 const quickBillValue=document.getElementById('quickBillValue');
 const kwhMode=document.getElementById('kwhMode');
 const billMode=document.getElementById('billMode');
+const estimateResult=document.getElementById('estimateResult');
 const resultEmpty=document.getElementById('resultEmpty');
 const resultData=document.getElementById('resultData');
 const needsStudy=document.getElementById('needsStudy');
@@ -380,6 +381,24 @@ function confidenceLabel(basis,shade,advanced,exactPrices,monthlyConsumption,ang
   return 'Precisión media';
 }
 
+function bringResultIntoView(){
+  if(!estimateResult) return;
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const rect=estimateResult.getBoundingClientRect();
+      const navOffset=window.innerWidth<=760?78:96;
+      const isNarrow=window.matchMedia('(max-width:980px)').matches;
+      const resultIsComfortablyVisible=rect.top>=navOffset && rect.top<window.innerHeight*.42;
+
+      if(isNarrow || !resultIsComfortablyVisible){
+        const targetY=window.scrollY+rect.top-navOffset;
+        window.scrollTo({top:Math.max(0,targetY),behavior:'smooth'});
+      }
+    });
+  });
+}
+
 function showStudyNeeded(title,text){
   resultEmpty.hidden=true;
   resultData.hidden=true;
@@ -387,6 +406,7 @@ function showStudyNeeded(title,text){
   document.getElementById('needsStudyTitle').textContent=title;
   document.getElementById('needsStudyText').textContent=text;
   realDataPanel.hidden=true;
+  bringResultIntoView();
 }
 
 function resetResultState(){
@@ -461,6 +481,7 @@ function renderEstimate(payload){
   document.getElementById('assumptionText').textContent=assumptions;
 
   lastEstimateContext=payload;
+  bringResultIntoView();
 }
 
 function advancedPrices(){
