@@ -56,15 +56,17 @@ Cuando el repositorio esté subido a GitHub:
 
 ## Simulador solar
 La rama `dev` incluye una primera versión funcional del estimador:
-- consulta irradiancia solar horaria histórica con Open-Meteo en el prototipo local;
+- consulta producción fotovoltaica horaria real con PVGIS 5.3 mediante el proxy local;
 - separa autoconsumo directo y excedentes;
 - aplica la compensación de excedentes mes a mes dentro del modelo económico;
 - muestra rangos en lugar de prometer una cifra exacta;
 - permite recalcular con consumo anual y precios reales de la factura;
-- se niega a dar una cifra cuando orientación norte o sombras confirmadas hacen que falten datos críticos.
+- se niega a dar una cifra rápida cuando orientación norte o sombras confirmadas hacen que falten datos críticos;
+- en el modo con factura permite continuar con sombras inciertas, pero marca la confianza como baja y declara que no se ha inventado una corrección por sombras;
+- admite orientación e inclinación más precisas y consumos mensuales con validación contra el total anual.
 
 ### Importante antes de producción
-El prototipo local usa Open-Meteo Geocoding y Open-Meteo Historical Weather para poder funcionar directamente en el navegador.
+El prototipo local usa Nominatim / OpenStreetMap para geocodificación y PVGIS 5.3 (JRC / Comisión Europea) para producción fotovoltaica. Ambas consultas pasan por `server.js`, evitando llamadas AJAX directas a PVGIS desde el navegador.
 
 Los rangos de precios de energía y excedentes del prototipo son supuestos editables, no tarifas prometidas. Deben revisarse antes del lanzamiento y el resultado final debe seguir identificándose como estimación.
 
