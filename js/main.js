@@ -574,7 +574,16 @@ if(realDataToggle){
         suggested=annualKwhInput.value;
       }
       document.getElementById('realAnnualKwh').value=suggested;
-      realDataPanel.scrollIntoView({behavior:'smooth',block:'start'});
+
+      // Wait for the expanded layout to finish reflowing before scrolling.
+      // This prevents the page from overshooting below the form.
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          const navOffset=96;
+          const targetY=window.scrollY+realDataPanel.getBoundingClientRect().top-navOffset;
+          window.scrollTo({top:Math.max(0,targetY),behavior:'smooth'});
+        });
+      });
     }
   });
 }
