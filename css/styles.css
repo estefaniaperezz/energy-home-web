@@ -944,3 +944,117 @@ h1{
   .brand strong{font-size:12px}
   .nav-cta{padding:9px 10px}
 }
+
+
+/* Restore Ekinova's signature hero scroll on mobile, with a lighter touch */
+@media(max-width:760px){
+  .story{
+    height:210vh;
+    min-height:1500px;
+    padding-top:66px;
+    position:relative;
+  }
+
+  .sticky{
+    position:sticky;
+    top:66px;
+    height:calc(100vh - 66px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  .hero-card{
+    width:calc(100% - 16px);
+    height:calc(100% - 12px);
+    min-height:0;
+    margin:0;
+    transform:
+      translateY(calc(var(--p) * -10px))
+      scale(calc(1 - var(--p) * .035)) !important;
+    transform-origin:center top;
+  }
+
+  .hero-content{
+    position:absolute;
+    inset:0;
+    min-height:0;
+    padding:76px 22px 46px;
+    display:flex;
+    align-items:flex-end;
+    opacity:calc(1 - var(--p) * 1.18) !important;
+    transform:translateY(calc(var(--p) * -14px)) !important;
+  }
+
+  .scroll-hint{
+    display:block;
+    bottom:15px;
+    font-size:9px;
+    opacity:calc(1 - var(--p) * 1.7);
+  }
+
+  .scroll-hint i{
+    height:28px;
+    margin-top:5px;
+  }
+
+  .reveal-panel{
+    position:absolute;
+    left:50%;
+    bottom:10px;
+    width:calc(100% - 16px);
+    margin:0;
+    transform:
+      translateX(-50%)
+      translateY(calc((1 - var(--p)) * 48vh)) !important;
+    opacity:clamp(0, calc((var(--p) - .08) * 1.9), 1) !important;
+    border-radius:24px 24px 0 0;
+    padding:34px 20px 24px;
+    min-height:0;
+    box-shadow:0 -24px 60px rgba(0,0,0,.18);
+    z-index:6;
+  }
+}
+
+@media(max-width:420px){
+  .story{
+    height:220vh;
+    min-height:1540px;
+  }
+
+  .hero-card,
+  .reveal-panel{
+    width:calc(100% - 10px);
+  }
+
+  .hero-content{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .reveal-panel{
+    padding-left:18px;
+    padding-right:18px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  @media(max-width:760px){
+    .story{height:auto;min-height:0}
+    .sticky{position:relative;top:auto;height:auto;overflow:visible}
+    .hero-card{height:auto;min-height:620px;transform:none!important}
+    .hero-content{position:relative;min-height:620px;opacity:1!important;transform:none!important}
+    .scroll-hint{display:none}
+    .reveal-panel{
+      position:relative;
+      left:auto;
+      bottom:auto;
+      width:calc(100% - 16px);
+      margin:12px auto 0;
+      transform:none!important;
+      opacity:1!important;
+      border-radius:24px;
+    }
+  }
+}
