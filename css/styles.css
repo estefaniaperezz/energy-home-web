@@ -224,6 +224,12 @@ h1 span{color:var(--gold2)}
   border-radius:999px;
   padding:11px 14px;
 }
+
+.saving-field select option,
+.form select option{
+  color:#17130f;
+  background:#f4efe7;
+}
 .saving-field input[type="range"]{width:100%;margin-top:20px;accent-color:var(--gold)}
 .saving-note{color:#9f968d;font-size:12px;line-height:1.55;margin:22px 0 0}
 .savings-result{display:flex;flex-direction:column;justify-content:center}
