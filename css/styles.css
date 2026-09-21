@@ -218,8 +218,8 @@ h1 span{color:var(--gold2)}
 .saving-field-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
 .saving-field label{font-size:13px;color:#ded5ca}
 .saving-field select{
-  background:rgba(255,255,255,.08);
-  color:#fff;
+  background:#fff;
+  color:#17130f;
   border:1px solid rgba(255,255,255,.18);
   border-radius:999px;
   padding:11px 14px;
@@ -228,7 +228,7 @@ h1 span{color:var(--gold2)}
 .saving-field select option,
 .form select option{
   color:#17130f;
-  background:#f4efe7;
+  background:#fff;
 }
 .saving-field input[type="range"]{width:100%;margin-top:20px;accent-color:var(--gold)}
 .saving-note{color:#9f968d;font-size:12px;line-height:1.55;margin:22px 0 0}
@@ -281,9 +281,13 @@ h1 span{color:var(--gold2)}
 .contact-copy h2 span{color:var(--gold2)}
 .contact-copy p{color:#cec5ba;line-height:1.55}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
-.form input,.form select,.form textarea{
+.form input,.form textarea{
   width:100%;min-width:0;border:1px solid rgba(255,255,255,.16);
   background:rgba(255,255,255,.06);color:white;border-radius:12px;padding:14px
+}
+.form select{
+  width:100%;min-width:0;border:1px solid rgba(255,255,255,.16);
+  background:#fff;color:#17130f;border-radius:12px;padding:14px
 }
 .form textarea{grid-column:1/-1;min-height:120px}
 .contact-image{
