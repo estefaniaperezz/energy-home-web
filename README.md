@@ -56,7 +56,7 @@ Cuando el repositorio esté subido a GitHub:
 
 ## Simulador solar
 La rama `dev` incluye una primera versión funcional del estimador:
-- consulta producción horaria histórica con PVGIS 5.3 (JRC / Comisión Europea);
+- consulta irradiancia solar horaria histórica con Open-Meteo en el prototipo local;
 - separa autoconsumo directo y excedentes;
 - aplica la compensación de excedentes mes a mes dentro del modelo económico;
 - muestra rangos en lugar de prometer una cifra exacta;
@@ -64,6 +64,10 @@ La rama `dev` incluye una primera versión funcional del estimador:
 - se niega a dar una cifra cuando orientación norte o sombras confirmadas hacen que falten datos críticos.
 
 ### Importante antes de producción
-El geocodificado de ubicación usa directamente el servicio público Nominatim de OpenStreetMap únicamente para el prototipo. Antes de publicar a escala debe pasarse a un proveedor/geocodificador de producción o a un proxy propio con caché y respetar su política de uso.
+El prototipo local usa Open-Meteo Geocoding y Open-Meteo Historical Weather para poder funcionar directamente en el navegador.
 
 Los rangos de precios de energía y excedentes del prototipo son supuestos editables, no tarifas prometidas. Deben revisarse antes del lanzamiento y el resultado final debe seguir identificándose como estimación.
+
+
+### Arquitectura prevista para producción
+PVGIS sigue siendo la referencia objetivo para el motor final, pero su documentación oficial indica que las llamadas AJAX desde navegador no están permitidas. Por tanto, la versión de producción deberá llamar a PVGIS a través de una función backend/serverless propia. Hasta entonces, el prototipo de Live Server utiliza Open-Meteo para que el flujo pueda probarse de extremo a extremo sin fingir resultados.
