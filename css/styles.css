@@ -241,9 +241,9 @@ h1 span{color:var(--gold2)}
 .saving-breakdown>div>span{display:block;color:#afa69d;font-size:12px;margin-bottom:10px}
 .saving-breakdown strong{
   display:block;
-  font-size:clamp(42px,4vw,58px);
-  line-height:.95;
-  letter-spacing:-.045em;
+  font-size:22px;
+  line-height:1.1;
+  letter-spacing:0;
   color:#fff;
 }
 .saving-breakdown strong span{display:inline;color:inherit;font-size:inherit;margin:0}
