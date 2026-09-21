@@ -264,23 +264,105 @@
 
         <div class="real-data-panel" id="realDataPanel" hidden>
           <div class="real-data-copy">
-            <div class="eyebrow">Cálculo con datos reales</div>
-            <h3>Usa los datos de tu factura.</h3>
-            <p>No hace falta subir ningún documento. Por ahora te pedimos tres cifras que puedes encontrar en tu factura y recalculamos automáticamente.</p>
+            <div class="eyebrow">Estimación con tu factura</div>
+            <h3>Usa tus datos reales.</h3>
+            <p>Con estos datos reducimos supuestos del cálculo rápido. No necesitas subir ningún documento: copia las cifras de tu factura y nosotros recalculamos.</p>
           </div>
+
           <form class="real-data-form" id="realDataForm">
-            <label>Consumo anual
-              <div class="input-with-unit"><input id="realAnnualKwh" type="number" min="500" max="30000" step="50" required><span>kWh</span></div>
-            </label>
-            <label>Precio de la energía <small>(opcional)</small>
-              <div class="input-with-unit"><input id="realBuyPrice" type="number" min="0.01" max="1" step="0.001" placeholder="Ej. 0,20"><span>€/kWh</span></div>
-            </label>
-            <label>Compensación de excedentes <small>(opcional)</small>
-              <div class="input-with-unit"><input id="realExportPrice" type="number" min="0" max="1" step="0.001" placeholder="Ej. 0,06"><span>€/kWh</span></div>
-            </label>
-            <button class="btn gold" type="submit">Recalcular con estos datos →</button>
+            <div class="real-form-section">
+              <div class="real-form-heading">
+                <span>01</span>
+                <div><b>Datos de la factura</b><small>Lo esencial para mejorar la estimación económica.</small></div>
+              </div>
+
+              <div class="real-form-grid">
+                <label>Consumo anual
+                  <div class="input-with-unit"><input id="realAnnualKwh" type="number" min="100" max="50000" step="1" required><span>kWh</span></div>
+                </label>
+                <label>Precio de la energía <small>(opcional)</small>
+                  <div class="input-with-unit"><input id="realBuyPrice" inputmode="decimal" placeholder="Ej. 0,20"><span>€/kWh</span></div>
+                </label>
+                <label>Compensación de excedentes <small>(opcional)</small>
+                  <div class="input-with-unit"><input id="realExportPrice" inputmode="decimal" placeholder="Ej. 0,06"><span>€/kWh</span></div>
+                </label>
+              </div>
+            </div>
+
+            <button class="advanced-data-toggle" id="advancedDataToggle" type="button">
+              <span><b>Tengo más información</b><small>Consumos mensuales y datos de la cubierta</small></span>
+              <i>+</i>
+            </button>
+
+            <div class="advanced-data-fields" id="advancedDataFields" hidden>
+              <div class="real-form-section">
+                <div class="real-form-heading">
+                  <span>02</span>
+                  <div><b>Datos de la cubierta</b><small>Si los conoces, PVGIS puede simular una geometría más parecida a la real.</small></div>
+                </div>
+
+                <div class="real-form-grid roof-grid">
+                  <label>Tipo de cubierta
+                    <select id="roofType">
+                      <option value="">No lo sé</option>
+                      <option value="sloped">Inclinada</option>
+                      <option value="flat">Plana</option>
+                    </select>
+                  </label>
+                  <label>Orientación más precisa
+                    <select id="preciseOrientation">
+                      <option value="">Mantener la estimación rápida</option>
+                      <option value="south">Sur</option>
+                      <option value="southeast">Sureste</option>
+                      <option value="southwest">Suroeste</option>
+                      <option value="east">Este</option>
+                      <option value="west">Oeste</option>
+                      <option value="eastwest">Este · Oeste (50/50)</option>
+                      <option value="north">Norte</option>
+                    </select>
+                  </label>
+                  <label>Inclinación aproximada
+                    <select id="roofTilt">
+                      <option value="">No lo sé</option>
+                      <option value="10">≈ 10°</option>
+                      <option value="20">≈ 20°</option>
+                      <option value="30">≈ 30°</option>
+                      <option value="40">≈ 40°</option>
+                      <option value="50">≈ 50°</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="real-form-section monthly-section">
+                <div class="real-form-heading monthly-heading">
+                  <span>03</span>
+                  <div><b>Consumos por mes</b><small>Opcional. Es la mejor forma de no asumir que consumes lo mismo en enero que en agosto.</small></div>
+                  <label class="monthly-switch"><input id="useMonthlyData" type="checkbox"><span>Usarlos</span></label>
+                </div>
+
+                <div class="monthly-grid" id="monthlyConsumptionGrid" hidden>
+                  <label>Ene<input type="number" min="0" step="1" data-month="0" placeholder="kWh"></label>
+                  <label>Feb<input type="number" min="0" step="1" data-month="1" placeholder="kWh"></label>
+                  <label>Mar<input type="number" min="0" step="1" data-month="2" placeholder="kWh"></label>
+                  <label>Abr<input type="number" min="0" step="1" data-month="3" placeholder="kWh"></label>
+                  <label>May<input type="number" min="0" step="1" data-month="4" placeholder="kWh"></label>
+                  <label>Jun<input type="number" min="0" step="1" data-month="5" placeholder="kWh"></label>
+                  <label>Jul<input type="number" min="0" step="1" data-month="6" placeholder="kWh"></label>
+                  <label>Ago<input type="number" min="0" step="1" data-month="7" placeholder="kWh"></label>
+                  <label>Sep<input type="number" min="0" step="1" data-month="8" placeholder="kWh"></label>
+                  <label>Oct<input type="number" min="0" step="1" data-month="9" placeholder="kWh"></label>
+                  <label>Nov<input type="number" min="0" step="1" data-month="10" placeholder="kWh"></label>
+                  <label>Dic<input type="number" min="0" step="1" data-month="11" placeholder="kWh"></label>
+                </div>
+                <p class="monthly-total" id="monthlyTotal"></p>
+              </div>
+            </div>
+
+            <button class="btn gold real-submit" type="submit">Recalcular mi estimación →</button>
           </form>
-          <p class="real-data-note">Si dejas los precios vacíos, mantenemos un rango de referencia. El cálculo económico se refiere al término de energía: no promete una factura final ni elimina potencia, impuestos u otros costes fijos.</p>
+
+          <p class="real-data-note">El resultado sigue siendo una estimación energética, no una oferta ni una factura futura garantizada. Si dejas precios o datos de cubierta vacíos, conservamos supuestos visibles y un rango más prudente.</p>
         </div>
       </div>
 
