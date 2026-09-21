@@ -98,7 +98,7 @@ async function handleGeocode(reqUrl,res){
     const result={
       lat:Number(best.lat),
       lon:Number(best.lon),
-      timezone:'Europe/Madrid',
+      timezone:Number(best.lon)<-12?'Atlantic/Canary':'Europe/Madrid',
       label:label||best.display_name
     };
 
