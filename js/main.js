@@ -375,10 +375,10 @@ function simulate(series,annualConsumption,peakPower,profileKey,prices,monthlyCo
 }
 
 function confidenceLabel(basis,shade,advanced,exactPrices,monthlyConsumption,angleIsAssumed){
-  if(shade==='unsure') return 'Precisión baja';
-  if(basis==='bill') return 'Precisión media-baja';
-  if(advanced&&exactPrices&&monthlyConsumption&&!angleIsAssumed) return 'Precisión media-alta';
-  return 'Precisión media';
+  if(shade==='unsure') return 'Estimación con incertidumbre';
+  if(basis==='bill') return 'Estimación orientativa';
+  if(advanced&&exactPrices&&monthlyConsumption&&!angleIsAssumed) return 'Estimación detallada';
+  return 'Estimación mejorada';
 }
 
 function bringResultIntoView(){
