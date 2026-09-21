@@ -69,5 +69,16 @@ El prototipo local usa Open-Meteo Geocoding y Open-Meteo Historical Weather para
 Los rangos de precios de energía y excedentes del prototipo son supuestos editables, no tarifas prometidas. Deben revisarse antes del lanzamiento y el resultado final debe seguir identificándose como estimación.
 
 
+### Probar el simulador en local
+
+PVGIS no permite llamadas AJAX directas desde el navegador. Para probar el cálculo real, la rama `dev` incluye un servidor Node sin dependencias externas que actúa como proxy.
+
+1. Abre una terminal en la carpeta del proyecto.
+2. Ejecuta `node server.js`.
+3. Abre `http://localhost:3000` en el navegador.
+4. Prueba el simulador desde esa dirección.
+
+El servidor sirve la propia web y consulta PVGIS desde Node, evitando el bloqueo CORS.
+
 ### Arquitectura prevista para producción
-PVGIS sigue siendo la referencia objetivo para el motor final, pero su documentación oficial indica que las llamadas AJAX desde navegador no están permitidas. Por tanto, la versión de producción deberá llamar a PVGIS a través de una función backend/serverless propia. Hasta entonces, el prototipo de Live Server utiliza Open-Meteo para que el flujo pueda probarse de extremo a extremo sin fingir resultados.
+La versión pública deberá mover las rutas `/api/geocode` y `/api/pvgis` a una función backend/serverless (por ejemplo, Vercel/Netlify/Cloudflare) para que la web publicada pueda mantener la misma lógica sin exponer claves ni depender de CORS.
