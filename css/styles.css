@@ -473,3 +473,12 @@ h1 span{color:var(--gold2)}
 .estimator-layout.real-data-open .real-data-panel{
   margin-top:0;
 }
+
+
+/* Solid expanded estimator panel: prevent background content from showing through */
+.real-data-panel{
+  background:#11100e !important;
+  position:relative;
+  z-index:8;
+  overflow:hidden;
+}
