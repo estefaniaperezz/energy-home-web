@@ -1113,3 +1113,43 @@ h1{
     margin-left:34px;
   }
 }
+
+
+/* Desktop contact reveal: image first, form slides into the final layout */
+@media(min-width:981px){
+  .contact-box{
+    position:relative;
+    display:block;
+    min-height:700px;
+    background:#201d19;
+    isolation:isolate;
+  }
+
+  .contact-image{
+    position:absolute;
+    inset:0;
+    min-height:0;
+    z-index:0;
+    transform:scale(1.025);
+    transform-origin:center center;
+    will-change:transform;
+  }
+
+  .contact-copy{
+    position:relative;
+    z-index:2;
+    width:62.75%;
+    min-height:700px;
+    background:#201d19;
+    transform:translateX(-105%);
+    box-shadow:34px 0 70px rgba(0,0,0,.16);
+    will-change:transform;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  @media(min-width:981px){
+    .contact-copy{transform:none!important}
+    .contact-image{transform:none!important}
+  }
+}
