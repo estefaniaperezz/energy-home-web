@@ -117,49 +117,176 @@
     <div class="shell">
       <div class="section-head fade savings-head">
         <div>
-          <div class="eyebrow">Ahorro y bienestar</div>
-          <h2>Tu ahorro, <span>mes a mes.</span></h2>
+          <div class="eyebrow">Estimación solar Ekinova</div>
+          <h2>Calcula con datos, <span>no con promesas.</span></h2>
         </div>
-        <p>Haz una estimación orientativa de cuánto podrías reducir tu factura. El cálculo definitivo dependerá del consumo, la vivienda y el estudio técnico.</p>
+        <p>Usamos tu ubicación y datos históricos de producción solar para darte una primera estimación. Si falta información importante, te lo diremos en lugar de inventar una cifra.</p>
       </div>
 
-      <div class="savings-grid">
-        <div class="savings-card fade">
-          <div class="saving-field">
-            <div class="saving-field-row">
-              <label for="homeType">Tipo de vivienda</label>
-              <select id="homeType">
-                <option value="1">Vivienda unifamiliar</option>
-                <option value=".92">Adosado</option>
-                <option value=".82">Piso / ático</option>
-              </select>
+      <div class="estimator-layout">
+        <form class="estimator-card fade" id="solarEstimator">
+          <div class="estimator-intro">
+            <span class="estimator-kicker">Estimación rápida</span>
+            <h3>Cuéntanos cinco cosas de tu vivienda.</h3>
+            <p>No necesitas conocimientos técnicos. Cuantos más datos reales tengas, menor será la incertidumbre.</p>
+          </div>
+
+          <div class="estimator-question">
+            <div class="question-number">01</div>
+            <div class="question-content">
+              <label for="solarLocation">¿Dónde está la vivienda?</label>
+              <p>Código postal o localidad. Lo usamos para consultar la producción solar histórica de la zona.</p>
+              <input id="solarLocation" type="text" placeholder="Ej. 05001 Ávila" autocomplete="postal-code" required>
             </div>
           </div>
 
-          <div class="saving-field">
-            <div class="saving-field-row">
-              <label for="bill">Factura mensual aproximada</label>
-              <strong><span id="billValue">120</span> € / mes</strong>
+          <div class="estimator-question">
+            <div class="question-number">02</div>
+            <div class="question-content">
+              <span class="question-label">¿Conoces tu consumo anual?</span>
+              <p>Los kWh de tu factura dan una estimación mejor. Si no los tienes, podemos partir de lo que pagas.</p>
+
+              <div class="mode-switch" role="group" aria-label="Dato de consumo disponible">
+                <button type="button" class="mode-btn active" data-consumption-mode="kwh">Sí, tengo los kWh</button>
+                <button type="button" class="mode-btn" data-consumption-mode="bill">Solo sé cuánto pago</button>
+              </div>
+
+              <div class="consumption-mode" id="kwhMode">
+                <div class="input-with-unit">
+                  <input id="annualKwh" type="number" min="500" max="30000" step="100" placeholder="Ej. 4200">
+                  <span>kWh / año</span>
+                </div>
+              </div>
+
+              <div class="consumption-mode" id="billMode" hidden>
+                <div class="bill-value"><strong><span id="quickBillValue">120</span> €</strong><span>/ mes</span></div>
+                <input id="quickBill" type="range" min="40" max="400" value="120" step="10">
+                <small>Al usar euros, el resultado tendrá un rango más amplio porque la factura incluye costes que no dependen del consumo.</small>
+              </div>
             </div>
-            <input id="bill" type="range" min="50" max="400" value="120" step="10">
           </div>
 
-          <p class="saving-note">Estimación orientativa para visualizar el potencial de ahorro. No constituye una oferta ni un cálculo técnico definitivo.</p>
-        </div>
+          <fieldset class="estimator-question">
+            <legend class="sr-only">Orientación del tejado</legend>
+            <div class="question-number">03</div>
+            <div class="question-content">
+              <span class="question-label">¿Qué orientación tiene el tejado?</span>
+              <p>La orientación cambia tanto la cantidad como las horas a las que se produce energía.</p>
+              <div class="choice-grid orientation-grid">
+                <label class="choice-card"><input type="radio" name="orientation" value="south"><span><b>Sur</b><small>Producción más centrada al mediodía</small></span></label>
+                <label class="choice-card"><input type="radio" name="orientation" value="eastwest"><span><b>Este · Oeste</b><small>Producción más repartida</small></span></label>
+                <label class="choice-card"><input type="radio" name="orientation" value="north"><span><b>Norte</b><small>Necesita revisar la cubierta</small></span></label>
+                <label class="choice-card"><input type="radio" name="orientation" value="unknown"><span><b>No lo sé</b><small>Te diremos qué dato falta</small></span></label>
+              </div>
+            </div>
+          </fieldset>
 
-        <div class="savings-card savings-result fade">
-          <div class="eyebrow">Ahorro estimado</div>
-          <div class="saving-main"><span id="monthlySaving">58</span> € <small>/ mes</small></div>
-          <div class="saving-annual"><span id="annualSaving">696</span> € de ahorro estimado al año</div>
+          <fieldset class="estimator-question">
+            <legend class="sr-only">Horario principal de consumo</legend>
+            <div class="question-number">04</div>
+            <div class="question-content">
+              <span class="question-label">¿Cuándo consumes más electricidad?</span>
+              <p>Esto nos ayuda a estimar cuánto aprovecharías directamente y cuánto enviarías a la red.</p>
+              <div class="choice-grid profile-grid">
+                <label class="choice-card"><input type="radio" name="profile" value="day"><span><b>Principalmente de día</b><small>Teletrabajo, climatización, coche...</small></span></label>
+                <label class="choice-card"><input type="radio" name="profile" value="balanced"><span><b>Repartido</b><small>Consumo durante todo el día</small></span></label>
+                <label class="choice-card"><input type="radio" name="profile" value="night"><span><b>Tarde · noche</b><small>La vivienda está vacía de día</small></span></label>
+              </div>
+            </div>
+          </fieldset>
 
-          <div class="saving-breakdown">
-            <div><span>Factura actual</span><strong><span id="currentBill">120</span> € / mes</strong></div>
-            <div><span>Factura estimada con solar</span><strong><span id="solarBill">62</span> € / mes</strong></div>
+          <fieldset class="estimator-question">
+            <legend class="sr-only">Sombras cercanas</legend>
+            <div class="question-number">05</div>
+            <div class="question-content">
+              <span class="question-label">¿Hay árboles o edificios que den sombra al tejado?</span>
+              <p>PVGIS tiene en cuenta el relieve del horizonte, pero no conoce los obstáculos próximos a tu vivienda.</p>
+              <div class="choice-grid shade-grid">
+                <label class="choice-card"><input type="radio" name="shade" value="no"><span><b>No</b></span></label>
+                <label class="choice-card"><input type="radio" name="shade" value="unsure"><span><b>No estoy segura/o</b></span></label>
+                <label class="choice-card"><input type="radio" name="shade" value="yes"><span><b>Sí</b></span></label>
+              </div>
+            </div>
+          </fieldset>
+
+          <button class="btn gold estimator-submit" id="estimateButton" type="submit">Calcular mi estimación →</button>
+          <p class="estimator-status" id="estimatorStatus" role="status"></p>
+        </form>
+
+        <aside class="estimate-result fade" id="estimateResult" aria-live="polite">
+          <div class="result-empty" id="resultEmpty">
+            <div class="result-orbit" aria-hidden="true"><span></span></div>
+            <div class="eyebrow">Tu resultado</div>
+            <h3>Aquí no hay un porcentaje fijo.</h3>
+            <p>Calcularemos una instalación preliminar para tu consumo y cruzaremos la producción solar con el horario en el que utilizas la electricidad.</p>
+            <div class="result-empty-points">
+              <span>Producción solar por ubicación</span>
+              <span>Autoconsumo y excedentes separados</span>
+              <span>Rango de ahorro, no una falsa cifra exacta</span>
+            </div>
           </div>
 
-          <a class="btn gold savings-cta" href="#contacto">Quiero un estudio personalizado →</a>
+          <div class="result-data" id="resultData" hidden>
+            <div class="result-topline">
+              <div class="eyebrow">Ahorro estimado en energía</div>
+              <span class="confidence-badge" id="confidenceBadge">Precisión media</span>
+            </div>
+
+            <div class="saving-range">
+              <span id="savingMin">—</span><i>–</i><span id="savingMax">—</span><b>€</b>
+              <small>/ año</small>
+            </div>
+
+            <p class="result-summary" id="resultSummary"></p>
+
+            <div class="estimate-metrics">
+              <div><span>Producción solar</span><strong id="productionRange">—</strong><small>kWh / año</small></div>
+              <div><span>Autoconsumo directo</span><strong id="selfUseRange">—</strong><small>kWh / año</small></div>
+              <div><span>Excedente estimado</span><strong id="exportRange">—</strong><small>kWh / año</small></div>
+              <div><span>Instalación simulada</span><strong id="systemSize">—</strong><small>kWp</small></div>
+            </div>
+
+            <div class="estimate-note">
+              <b>Qué estamos calculando</b>
+              <p id="assumptionText"></p>
+            </div>
+
+            <button class="btn result-detail-btn" id="realDataToggle" type="button">Calcular con mis datos reales →</button>
+          </div>
+
+          <div class="result-data needs-study" id="needsStudy" hidden>
+            <div class="eyebrow">Antes de darte una cifra</div>
+            <h3 id="needsStudyTitle">Necesitamos un dato más.</h3>
+            <p id="needsStudyText"></p>
+            <a href="#contacto" class="btn gold">Pedir una revisión personalizada →</a>
+          </div>
+        </aside>
+
+        <div class="real-data-panel" id="realDataPanel" hidden>
+          <div class="real-data-copy">
+            <div class="eyebrow">Cálculo con datos reales</div>
+            <h3>Usa los datos de tu factura.</h3>
+            <p>No hace falta subir ningún documento. Por ahora te pedimos tres cifras que puedes encontrar en tu factura y recalculamos automáticamente.</p>
+          </div>
+          <form class="real-data-form" id="realDataForm">
+            <label>Consumo anual
+              <div class="input-with-unit"><input id="realAnnualKwh" type="number" min="500" max="30000" step="50" required><span>kWh</span></div>
+            </label>
+            <label>Precio de la energía <small>(opcional)</small>
+              <div class="input-with-unit"><input id="realBuyPrice" type="number" min="0.01" max="1" step="0.001" placeholder="Ej. 0,20"><span>€/kWh</span></div>
+            </label>
+            <label>Compensación de excedentes <small>(opcional)</small>
+              <div class="input-with-unit"><input id="realExportPrice" type="number" min="0" max="1" step="0.001" placeholder="Ej. 0,06"><span>€/kWh</span></div>
+            </label>
+            <button class="btn gold" type="submit">Recalcular con estos datos →</button>
+          </form>
+          <p class="real-data-note">Si dejas los precios vacíos, mantenemos un rango de referencia. El cálculo económico se refiere al término de energía: no promete una factura final ni elimina potencia, impuestos u otros costes fijos.</p>
         </div>
       </div>
+
+      <div class="estimator-sources">
+        <span>Producción solar: PVGIS 5.3 · Joint Research Centre, Comisión Europea</span>
+        <span>Ubicación aproximada: © OpenStreetMap contributors</span>
       </div>
     </div>
   </section>
