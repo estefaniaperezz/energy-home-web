@@ -50,6 +50,38 @@ processSteps.forEach(step=>{
 });
 
 // Ekinova solar estimator — transparent, data-led prototype
+
+const contactSection=document.getElementById('contacto');
+const contactBox=contactSection?.querySelector('.contact-box');
+const contactCopy=contactSection?.querySelector('.contact-copy');
+const contactImage=contactSection?.querySelector('.contact-image');
+
+function updateContactReveal(){
+  if(!contactBox||!contactCopy||!contactImage) return;
+
+  const desktop=window.matchMedia('(min-width:981px)').matches;
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if(!desktop||reducedMotion){
+    contactCopy.style.transform='';
+    contactImage.style.transform='';
+    return;
+  }
+
+  const rect=contactBox.getBoundingClientRect();
+  const start=window.innerHeight*.88;
+  const end=window.innerHeight*.18;
+  const raw=Math.min(1,Math.max(0,(start-rect.top)/Math.max(1,start-end)));
+  const p=raw*raw*(3-2*raw);
+
+  contactCopy.style.transform='translateX('+(-105*(1-p)).toFixed(2)+'%)';
+  contactImage.style.transform='scale('+(1.025-.025*p).toFixed(4)+')';
+}
+
+addEventListener('scroll',updateContactReveal,{passive:true});
+addEventListener('resize',updateContactReveal);
+updateContactReveal();
+
 const estimatorForm=document.getElementById('solarEstimator');
 const estimateButton=document.getElementById('estimateButton');
 const estimatorStatus=document.getElementById('estimatorStatus');
