@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NOVA — Home con transición de scroll</title>
+<meta name="description" content="Prototipo de home con transición narrativa al hacer scroll." />
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="shell nav-in">
+    <a href="#inicio" class="brand">
+      <span class="brand-mark"></span>
+      <span><strong>NOVA</strong><small>ENERGÍA REAL · PARA TU HOGAR</small></span>
+    </a>
+    <nav class="navlinks">
+      <a href="#inicio">Inicio</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#proceso">Cómo trabajamos</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <a href="#contacto" class="nav-cta">Solicitar estudio →</a>
+  </div>
+</header>
+
+<main>
+  <section class="story" id="inicio">
+    <div class="sticky">
+      <div class="hero-card">
+        <div class="hero-content">
+          <div>
+            <div class="eyebrow">Hogares más eficientes</div>
+            <h1>La energía de tu hogar, <span>sin límites.</span></h1>
+            <p class="lede">Soluciones en energía solar, climatización y suelo radiante para un hogar más eficiente, confortable y sostenible.</p>
+            <div class="actions">
+              <a class="btn gold" href="#contacto">Solicitar estudio →</a>
+              <a class="btn ghost" href="#servicios">Conoce nuestros servicios</a>
+            </div>
+          </div>
+          <aside class="side-index">
+            <div class="index-row"><small>01</small>Energía solar</div>
+            <div class="index-row"><small>02</small>Suelo radiante</div>
+            <div class="index-row"><small>03</small>Climatización eficiente</div>
+          </aside>
+        </div>
+        <div class="scroll-hint">Desliza para activar la energía<i></i></div>
+      </div>
+    </div>
+
+    <div class="reveal-panel" id="servicios">
+      <div class="reveal-top">
+        <div>
+          <div class="eyebrow" style="color:#a4742c">Soluciones NOVA</div>
+          <h2>La energía se transforma <span>en bienestar.</span></h2>
+        </div>
+        <p>Al hacer scroll, la portada no desaparece de golpe: se repliega y deja paso a las soluciones. Este es el efecto inspirado en tu referencia, pero adaptado a nuestro lenguaje cálido y premium.</p>
+      </div>
+
+      <div class="service-grid">
+        <article class="service-card">
+          <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=900&q=85" alt="">
+          <div class="service-body"><small>01</small><h3>Energía solar</h3><p>Ahorro, autoconsumo y una vivienda más preparada para el futuro.</p><a href="#contacto">Saber más →</a></div>
+        </article>
+        <article class="service-card">
+          <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85" alt="">
+          <div class="service-body"><small>02</small><h3>Suelo radiante</h3><p>Confort uniforme e invisible para disfrutar de cada estancia.</p><a href="#contacto">Saber más →</a></div>
+        </article>
+        <article class="service-card">
+          <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85" alt="">
+          <div class="service-body"><small>03</small><h3>Climatización</h3><p>Temperatura ideal con sistemas eficientes y de bajo consumo.</p><a href="#contacto">Saber más →</a></div>
+        </article>
+        <article class="service-card">
+          <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=85" alt="">
+          <div class="service-body"><small>04</small><h3>Asesoramiento</h3><p>Estudio, diseño, instalación y acompañamiento de principio a fin.</p><a href="#contacto">Saber más →</a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="after-story">
+    <div class="shell benefits fade">
+      <div>
+        <div class="eyebrow" style="color:#a4742c">Más que energía</div>
+        <h2>Bienestar hoy.<br>Un mejor <span>mañana.</span></h2>
+      </div>
+      <div class="benefit"><div>◒</div><b>Ahorro real</b><p>Reduce tu factura desde el primer día.</p></div>
+      <div class="benefit"><div>⌂</div><b>Confort todo el año</b><p>Temperatura ideal en cada estación.</p></div>
+      <div class="benefit"><div>☼</div><b>Energía limpia</b><p>Cuida tu hogar y también el planeta.</p></div>
+      <div class="benefit"><div>▥</div><b>Mayor valor</b><p>Una inversión que mejora tu vivienda.</p></div>
+    </div>
+  </section>
+
+  <section class="dark-section" id="proceso">
+    <div class="shell">
+      <div class="section-head fade">
+        <div><div class="eyebrow">Cómo trabajamos</div><h2>Un proceso claro para <span>un futuro mejor.</span></h2></div>
+        <p>He mantenido esta parte interactiva para que podamos decidir después si nos convence o si buscamos otra solución visual.</p>
+      </div>
+
+      <div class="process-grid">
+        <div class="process-visual fade" id="processVisual">
+          <div class="process-copy">
+            <div class="eyebrow" id="procEye">01 · Estudio inicial</div>
+            <h3 id="procTitle">Entendemos tu hogar.</h3>
+            <p id="procText">Analizamos vivienda, consumo y objetivos para encontrar la solución que mejor encaja.</p>
+          </div>
+        </div>
+
+        <div class="steps fade">
+          <div class="step active" data-step="0"><div class="step-top"><small>01</small><h4>Estudio inicial</h4></div><p>Analizamos vivienda, hábitos y necesidades.</p></div>
+          <div class="step" data-step="1"><div class="step-top"><small>02</small><h4>Propuesta personalizada</h4></div><p>Diseñamos una solución clara, medible y adaptada.</p></div>
+          <div class="step" data-step="2"><div class="step-top"><small>03</small><h4>Instalación</h4></div><p>Coordinamos un montaje rápido, seguro y limpio.</p></div>
+          <div class="step" data-step="3"><div class="step-top"><small>04</small><h4>Puesta en marcha</h4></div><p>Activamos el sistema y te explicamos cómo aprovecharlo.</p></div>
+          <div class="step" data-step="4"><div class="step-top"><small>05</small><h4>Seguimiento</h4></div><p>Seguimos disponibles después de la instalación.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contacto">
+    <div class="shell">
+      <div class="contact-box fade">
+        <div class="contact-copy">
+          <div class="eyebrow">Un futuro más cerca</div>
+          <h2>Hablemos de <span>tu proyecto.</span></h2>
+          <p>Cuéntanos qué necesitas y te asesoraremos con una propuesta a medida.</p>
+          <form class="form" onsubmit="event.preventDefault();document.getElementById('thanks').textContent='Perfecto. En la web final conectaremos el formulario.'">
+            <input placeholder="Nombre *" required>
+            <input placeholder="Teléfono *" required>
+            <input type="email" placeholder="Email *" style="grid-column:1/-1" required>
+            <select style="grid-column:1/-1"><option>Tipo de proyecto *</option><option>Placas solares</option><option>Suelo radiante</option><option>Climatización</option></select>
+            <textarea placeholder="Mensaje (opcional)"></textarea>
+            <button class="btn gold" type="submit">Solicitar presupuesto →</button>
+            <span id="thanks" style="align-self:center;color:#cfc5ba;font-size:12px"></span>
+          </form>
+        </div>
+        <div class="contact-image"><div class="quote">“La energía que mejora <span>tu vida.</span>”</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="shell">NOVA · Nombre provisional · Concepto de transición de scroll v3</div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
