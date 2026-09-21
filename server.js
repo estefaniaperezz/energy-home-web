@@ -101,7 +101,6 @@ async function handlePvgis(reqUrl,res){
       pvtechchoice:'crystSi',
       mountingplace:'building',
       usehorizon:1,
-      localtime:1,
       outputformat:'json'
     };
     Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,String(v)));
