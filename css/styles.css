@@ -1115,43 +1115,41 @@ h1{
 }
 
 
-/* Desktop contact reveal: image first, form slides into the final layout */
+/* Desktop contact: quiet motion, stronger focus on the form */
 @media(min-width:981px){
   .contact-box{
-    position:relative;
-    display:block;
-    min-height:700px;
+    display:grid;
+    grid-template-columns:minmax(0,1.7fr) minmax(330px,1fr);
+    min-height:650px;
     background:#201d19;
     isolation:isolate;
   }
 
-  .contact-image{
-    position:absolute;
-    top:0;
-    right:0;
-    bottom:0;
-    width:52%;
-    min-height:0;
-    z-index:0;
-    background-position:center center;
-    background-size:cover;
+  .contact-copy{
+    min-width:0;
+    min-height:650px;
+    padding:52px;
+    background:#201d19;
+    will-change:transform,opacity;
   }
 
-  .contact-copy{
-    position:relative;
-    z-index:2;
-    width:62.75%;
-    min-height:700px;
-    background:#201d19;
-    transform:translateX(-102%);
-    box-shadow:34px 0 70px rgba(0,0,0,.16);
-    will-change:transform;
+  .contact-image{
+    min-width:0;
+    min-height:650px;
+    background-position:center 50%;
+    background-size:cover;
+    will-change:background-position;
   }
 }
 
 @media(prefers-reduced-motion:reduce){
   @media(min-width:981px){
-    .contact-copy{transform:none!important}
-    .contact-image{transform:none!important}
+    .contact-copy{
+      transform:none!important;
+      opacity:1!important;
+    }
+    .contact-image{
+      background-position:center 50%!important;
+    }
   }
 }
