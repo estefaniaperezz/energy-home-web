@@ -1127,12 +1127,14 @@ h1{
 
   .contact-image{
     position:absolute;
-    inset:0;
+    top:0;
+    right:0;
+    bottom:0;
+    width:52%;
     min-height:0;
     z-index:0;
-    transform:scale(1.025);
-    transform-origin:center center;
-    will-change:transform;
+    background-position:center center;
+    background-size:cover;
   }
 
   .contact-copy{
@@ -1141,7 +1143,7 @@ h1{
     width:62.75%;
     min-height:700px;
     background:#201d19;
-    transform:translateX(-105%);
+    transform:translateX(-102%);
     box-shadow:34px 0 70px rgba(0,0,0,.16);
     will-change:transform;
   }
