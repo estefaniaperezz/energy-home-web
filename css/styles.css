@@ -599,3 +599,70 @@ h1{
 }
 .monthly-check.ok{color:#c7d9b8}
 .monthly-check.warning{color:#efc579}
+
+
+/* Pre-production estimator hardening */
+.field-hint{
+  display:block;
+  color:#817970;
+  font-size:9px;
+  line-height:1.35;
+  margin-top:6px;
+}
+.real-data-panel,
+.real-data-copy,
+.real-data-form,
+.real-form-section,
+.real-form-grid,
+.monthly-section,
+.monthly-heading,
+.monthly-heading>div,
+.monthly-grid,
+.monthly-grid label{
+  min-width:0;
+}
+.real-form-grid>*,
+.monthly-grid>*,
+.monthly-grid input,
+.real-form-grid input,
+.real-form-grid select{
+  min-width:0;
+  max-width:100%;
+}
+.saving-range{
+  font-size:clamp(44px,4.7vw,62px);
+}
+.confidence-badge{
+  font-size:13px;
+  font-weight:700;
+  border-color:rgba(232,183,91,.30);
+  background:rgba(232,183,91,.08);
+}
+@media(max-width:640px){
+  .real-data-panel{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+  .monthly-heading{
+    flex-wrap:wrap;
+  }
+  .monthly-heading>div{
+    flex:1 1 calc(100% - 42px);
+  }
+  .monthly-switch{
+    width:100%;
+    margin-left:40px;
+    margin-top:4px;
+  }
+  .monthly-grid{
+    width:100%;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .advanced-data-toggle{
+    min-width:0;
+  }
+  .advanced-data-toggle>span{
+    min-width:0;
+  }
+}
