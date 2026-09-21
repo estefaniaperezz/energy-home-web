@@ -563,6 +563,9 @@ if(estimatorForm){
 if(realDataToggle){
   realDataToggle.addEventListener('click',()=>{
     realDataPanel.hidden=!realDataPanel.hidden;
+    const layout=document.querySelector('.estimator-layout');
+    if(layout) layout.classList.toggle('real-data-open',!realDataPanel.hidden);
+
     if(!realDataPanel.hidden){
       let suggested='';
       if(lastEstimateContext){
@@ -571,7 +574,7 @@ if(realDataToggle){
         suggested=annualKwhInput.value;
       }
       document.getElementById('realAnnualKwh').value=suggested;
-      realDataPanel.scrollIntoView({behavior:'smooth',block:'center'});
+      realDataPanel.scrollIntoView({behavior:'smooth',block:'start'});
     }
   });
 }
