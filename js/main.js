@@ -64,16 +64,24 @@ function updateContactReveal(){
 
   if(!desktop||reducedMotion){
     contactCopy.style.transform='';
+    contactCopy.style.opacity='';
+    contactImage.style.backgroundPosition='';
     return;
   }
 
   const rect=contactBox.getBoundingClientRect();
-  const start=window.innerHeight*.88;
-  const end=window.innerHeight*.18;
+  const start=window.innerHeight*.92;
+  const end=window.innerHeight*.24;
   const raw=Math.min(1,Math.max(0,(start-rect.top)/Math.max(1,start-end)));
   const p=raw*raw*(3-2*raw);
 
-  contactCopy.style.transform='translateX('+(-102*(1-p)).toFixed(2)+'%)';
+  const lift=36*(1-p);
+  const opacity=.38+(.62*p);
+  const imageY=46+(8*p);
+
+  contactCopy.style.transform='translateY('+lift.toFixed(1)+'px)';
+  contactCopy.style.opacity=opacity.toFixed(3);
+  contactImage.style.backgroundPosition='center '+imageY.toFixed(2)+'%';
 }
 
 addEventListener('scroll',updateContactReveal,{passive:true});
