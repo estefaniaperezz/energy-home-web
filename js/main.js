@@ -6,8 +6,9 @@ function updateStory(){
   const rect=story.getBoundingClientRect();
   const total=story.offsetHeight-window.innerHeight;
   const raw=Math.min(1,Math.max(0,-rect.top/Math.max(1,total)));
-  // Smoothstep makes the motion feel less mechanical.
-  const p=raw*raw*(3-2*raw);
+  // La transición comienza antes para evitar un tramo de scroll sin respuesta visual.
+  const active=Math.min(1,Math.max(0,(raw-.03)/.82));
+  const p=active*active*(3-2*active);
   root.style.setProperty('--p',p.toFixed(4));
   nav.classList.toggle('scrolled',window.scrollY>42);
 }
@@ -41,3 +42,30 @@ document.querySelectorAll('.step').forEach(step=>{
     visual.style.backgroundImage=`linear-gradient(0deg,rgba(8,7,6,.68),rgba(8,7,6,.05)),url('${d[3]}')`;
   });
 });
+
+// Savings simulator — visual/orientative only
+const billInput=document.getElementById('bill');
+const homeType=document.getElementById('homeType');
+
+function updateSavings(){
+  if(!billInput || !homeType) return;
+
+  const bill=Number(billInput.value);
+  const factor=Number(homeType.value);
+  const savingRate=.48*factor;
+  const monthly=Math.max(0,Math.round(bill*savingRate));
+  const solar=Math.max(0,bill-monthly);
+  const annual=monthly*12;
+
+  document.getElementById('billValue').textContent=bill;
+  document.getElementById('currentBill').textContent=bill;
+  document.getElementById('monthlySaving').textContent=monthly;
+  document.getElementById('solarBill').textContent=solar;
+  document.getElementById('annualSaving').textContent=annual.toLocaleString('es-ES');
+}
+
+if(billInput && homeType){
+  billInput.addEventListener('input',updateSavings);
+  homeType.addEventListener('change',updateSavings);
+  updateSavings();
+}
