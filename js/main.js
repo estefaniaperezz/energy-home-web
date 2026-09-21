@@ -367,7 +367,8 @@ function simulate(series,annualConsumption,peakPower,profileKey,prices,monthlyCo
   return results;
 }
 
-function confidenceLabel(basis,advanced,exactPrices,monthlyConsumption,angleIsAssumed){
+function confidenceLabel(basis,shade,advanced,exactPrices,monthlyConsumption,angleIsAssumed){
+  if(shade==='unsure') return 'Precisión baja';
   if(basis==='bill') return 'Precisión media-baja';
   if(advanced&&exactPrices&&monthlyConsumption&&!angleIsAssumed) return 'Precisión media-alta';
   return 'Precisión media';
@@ -446,7 +447,7 @@ function renderEstimate(payload){
   }
 
   if(payload.shade==='unsure'){
-    assumptions+=' No hemos podido confirmar sombras próximas, por eso reducimos la confianza del resultado.';
+    assumptions+=' No hemos podido confirmar sombras próximas. El cálculo mostrado NO aplica una corrección inventada por sombras; por eso la confianza se mantiene baja hasta revisar la cubierta.';
   }else{
     assumptions+=' PVGIS considera el horizonte del terreno, pero no las sombras concretas de edificios, árboles o chimeneas próximos; una revisión técnica sigue siendo necesaria.';
   }
@@ -462,18 +463,34 @@ function advancedPrices(){
   const buy=buyRaw?parseDecimal(buyRaw):null;
   const exported=exportRaw?parseDecimal(exportRaw):null;
 
+  if(buyRaw && (!Number.isFinite(buy) || buy<.03 || buy>1)){
+    throw new Error('Revisa el precio de la energía: debe estar entre 0,03 y 1,00 €/kWh.');
+  }
+
+  if(exportRaw && (!Number.isFinite(exported) || exported<0 || exported>.5)){
+    throw new Error('Revisa la compensación de excedentes: debe estar entre 0 y 0,50 €/kWh.');
+  }
+
   return {
-    buy:Number.isFinite(buy)&&buy>0?[buy,buy]:ESTIMATOR_ASSUMPTIONS.buyPrice,
-    exported:Number.isFinite(exported)&&exported>=0?[exported,exported]:ESTIMATOR_ASSUMPTIONS.exportPrice,
-    exact:Number.isFinite(buy)&&buy>0&&Number.isFinite(exported)&&exported>=0
+    buy:Number.isFinite(buy)?[buy,buy]:ESTIMATOR_ASSUMPTIONS.buyPrice,
+    exported:Number.isFinite(exported)?[exported,exported]:ESTIMATOR_ASSUMPTIONS.exportPrice,
+    exact:Number.isFinite(buy)&&Number.isFinite(exported)
   };
 }
 
 function getMonthlyConsumption(){
   if(!useMonthlyData || !useMonthlyData.checked) return null;
-  const values=[...document.querySelectorAll('#monthlyConsumptionGrid input[data-month]')].map(input=>Number(input.value));
-  if(values.some(value=>!Number.isFinite(value)||value<0)){
-    throw new Error('Completa los 12 consumos mensuales o desactiva esa opción.');
+  const inputs=[...document.querySelectorAll('#monthlyConsumptionGrid input[data-month]')];
+
+  const emptyMonth=inputs.find(input=>input.value.trim()==='');
+  if(emptyMonth){
+    const monthLabel=emptyMonth.closest('label')?.childNodes[0]?.textContent.trim()||'un mes';
+    throw new Error('Falta el consumo de '+monthLabel+'. Completa los 12 meses o desactiva esa opción.');
+  }
+
+  const values=inputs.map(input=>Number(input.value));
+  if(values.some(value=>!Number.isFinite(value)||value<0||value>10000)){
+    throw new Error('Revisa los consumos mensuales: cada valor debe estar entre 0 y 10.000 kWh.');
   }
   if(values.every(value=>value===0)){
     throw new Error('Los consumos mensuales no pueden estar todos a cero.');
@@ -530,11 +547,11 @@ async function runSolarEstimate(options={}){
     return;
   }
 
-  if(shade==='unsure'){
+  if(!advanced && shade==='unsure'){
     estimatorStatus.textContent='';
     showStudyNeeded(
       'Antes de calcular, necesitamos confirmar las sombras.',
-      'Si no sabemos si hay árboles, edificios o chimeneas que sombreen la cubierta, el mismo número podría parecer más fiable de lo que es. Preferimos confirmar este punto antes de darte un ahorro en euros.'
+      'Si no sabemos si hay árboles, edificios o chimeneas que sombreen la cubierta, el mismo número podría parecer más fiable de lo que es. Puedes usar los datos de tu factura para continuar con una estimación marcada como baja confianza.'
     );
     return;
   }
@@ -604,7 +621,16 @@ async function runSolarEstimate(options={}){
     const yieldPerKwp=annualYieldPerKwp(series);
     const midConsumption=(consumption.min+consumption.max)/2;
     const theoreticalPower=(midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp;
-    const peakPower=Math.max(.1,Math.round(theoreticalPower*10)/10);
+
+    if(theoreticalPower<.5){
+      throw new Error('Tu consumo es demasiado bajo para que esta estimación rápida dimensione una instalación residencial con sentido. Necesitamos revisarlo de forma personalizada.');
+    }
+
+    if(theoreticalPower>15){
+      throw new Error('La potencia preliminar supera 15 kWp. Para consumos de este tamaño preferimos hacer un estudio personalizado en lugar de mostrar una cifra residencial simplificada.');
+    }
+
+    const peakPower=Math.round(theoreticalPower*10)/10;
     const candidates=consumption.min===consumption.max?[consumption.min]:[consumption.min,consumption.max];
     const scenarios=[];
     candidates.forEach(value=>{
@@ -613,6 +639,7 @@ async function runSolarEstimate(options={}){
 
     const confidence=confidenceLabel(
       consumption.basis,
+      shade,
       advanced,
       exactPrices,
       monthlyConsumption,
