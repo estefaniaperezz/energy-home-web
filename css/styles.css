@@ -1058,3 +1058,59 @@ h1{
     }
   }
 }
+
+
+/* Mobile process: keep the selected photo and its copy together */
+@media(max-width:760px){
+  #proceso .process-visual{
+    display:none;
+  }
+
+  #proceso .process-grid{
+    display:block;
+  }
+
+  #proceso .steps{
+    display:grid;
+    gap:10px;
+  }
+
+  #proceso .step{
+    overflow:hidden;
+  }
+
+  #proceso .step.active{
+    padding:16px;
+    background:rgba(232,183,91,.07);
+  }
+
+  #proceso .step.active::before{
+    content:"";
+    display:block;
+    width:auto;
+    height:190px;
+    margin:-16px -16px 17px;
+    background:
+      linear-gradient(180deg,rgba(8,7,6,.04),rgba(8,7,6,.42)),
+      var(--step-image) center/cover no-repeat;
+    border-bottom:1px solid rgba(232,183,91,.18);
+  }
+
+  #proceso .step.active p{
+    display:block;
+    margin:10px 0 0 34px;
+    color:#d2c7bb;
+    font-size:14px;
+    line-height:1.55;
+  }
+}
+
+@media(max-width:420px){
+  #proceso .step.active::before{
+    height:172px;
+  }
+
+  #proceso .step.active p{
+    margin-left:34px;
+  }
+}
