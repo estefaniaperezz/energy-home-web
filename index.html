@@ -284,10 +284,12 @@
                   <div class="input-with-unit"><input id="realAnnualKwh" type="number" min="100" max="50000" step="1" required><span>kWh</span></div>
                 </label>
                 <label>Precio de la energía <small>(opcional)</small>
-                  <div class="input-with-unit"><input id="realBuyPrice" inputmode="decimal" placeholder="Ej. 0,20"><span>€/kWh</span></div>
+                  <div class="input-with-unit"><input id="realBuyPrice" inputmode="decimal" placeholder="Ej. 0,20" aria-describedby="buyPriceHint"><span>€/kWh</span></div>
+                  <small class="field-hint" id="buyPriceHint">Admitimos valores entre 0,03 y 1,00 €/kWh para evitar errores de coma.</small>
                 </label>
                 <label>Compensación de excedentes <small>(opcional)</small>
-                  <div class="input-with-unit"><input id="realExportPrice" inputmode="decimal" placeholder="Ej. 0,06"><span>€/kWh</span></div>
+                  <div class="input-with-unit"><input id="realExportPrice" inputmode="decimal" placeholder="Ej. 0,06" aria-describedby="exportPriceHint"><span>€/kWh</span></div>
+                  <small class="field-hint" id="exportPriceHint">Admitimos valores entre 0 y 0,50 €/kWh para evitar errores de entrada.</small>
                 </label>
               </div>
             </div>
@@ -338,18 +340,18 @@
                 </div>
 
                 <div class="monthly-grid" id="monthlyConsumptionGrid" hidden>
-                  <label>Ene<input type="number" min="0" step="1" data-month="0" placeholder="kWh"></label>
-                  <label>Feb<input type="number" min="0" step="1" data-month="1" placeholder="kWh"></label>
-                  <label>Mar<input type="number" min="0" step="1" data-month="2" placeholder="kWh"></label>
-                  <label>Abr<input type="number" min="0" step="1" data-month="3" placeholder="kWh"></label>
-                  <label>May<input type="number" min="0" step="1" data-month="4" placeholder="kWh"></label>
-                  <label>Jun<input type="number" min="0" step="1" data-month="5" placeholder="kWh"></label>
-                  <label>Jul<input type="number" min="0" step="1" data-month="6" placeholder="kWh"></label>
-                  <label>Ago<input type="number" min="0" step="1" data-month="7" placeholder="kWh"></label>
-                  <label>Sep<input type="number" min="0" step="1" data-month="8" placeholder="kWh"></label>
-                  <label>Oct<input type="number" min="0" step="1" data-month="9" placeholder="kWh"></label>
-                  <label>Nov<input type="number" min="0" step="1" data-month="10" placeholder="kWh"></label>
-                  <label>Dic<input type="number" min="0" step="1" data-month="11" placeholder="kWh"></label>
+                  <label>Ene<input type="number" min="0" max="10000" step="1" data-month="0" placeholder="kWh"></label>
+                  <label>Feb<input type="number" min="0" max="10000" step="1" data-month="1" placeholder="kWh"></label>
+                  <label>Mar<input type="number" min="0" max="10000" step="1" data-month="2" placeholder="kWh"></label>
+                  <label>Abr<input type="number" min="0" max="10000" step="1" data-month="3" placeholder="kWh"></label>
+                  <label>May<input type="number" min="0" max="10000" step="1" data-month="4" placeholder="kWh"></label>
+                  <label>Jun<input type="number" min="0" max="10000" step="1" data-month="5" placeholder="kWh"></label>
+                  <label>Jul<input type="number" min="0" max="10000" step="1" data-month="6" placeholder="kWh"></label>
+                  <label>Ago<input type="number" min="0" max="10000" step="1" data-month="7" placeholder="kWh"></label>
+                  <label>Sep<input type="number" min="0" max="10000" step="1" data-month="8" placeholder="kWh"></label>
+                  <label>Oct<input type="number" min="0" max="10000" step="1" data-month="9" placeholder="kWh"></label>
+                  <label>Nov<input type="number" min="0" max="10000" step="1" data-month="10" placeholder="kWh"></label>
+                  <label>Dic<input type="number" min="0" max="10000" step="1" data-month="11" placeholder="kWh"></label>
                 </div>
                 <p class="monthly-total" id="monthlyTotal"></p>
                 <p class="monthly-check" id="monthlyCheck"></p>
