@@ -31,15 +31,21 @@ const pdata=[
 ['05 · Seguimiento','Seguimos a tu lado.','La instalación termina, pero la atención continúa.','https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1600&q=85']
 ];
 const visual=document.getElementById('processVisual');
-document.querySelectorAll('.step').forEach(step=>{
+const processSteps=[...document.querySelectorAll('.step')];
+
+processSteps.forEach(step=>{
+  const d=pdata[+step.dataset.step];
+  // Mobile uses the same image inside the active accordion card.
+  step.style.setProperty('--step-image',`url("${d[3]}")`);
+
   step.addEventListener('click',()=>{
-    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    processSteps.forEach(s=>s.classList.remove('active'));
     step.classList.add('active');
-    const d=pdata[+step.dataset.step];
-    document.getElementById('procEye').textContent=d[0];
-    document.getElementById('procTitle').textContent=d[1];
-    document.getElementById('procText').textContent=d[2];
-    visual.style.backgroundImage=`linear-gradient(0deg,rgba(8,7,6,.68),rgba(8,7,6,.05)),url('${d[3]}')`;
+    const current=pdata[+step.dataset.step];
+    document.getElementById('procEye').textContent=current[0];
+    document.getElementById('procTitle').textContent=current[1];
+    document.getElementById('procText').textContent=current[2];
+    visual.style.backgroundImage=`linear-gradient(0deg,rgba(8,7,6,.68),rgba(8,7,6,.05)),url('${current[3]}')`;
   });
 });
 
