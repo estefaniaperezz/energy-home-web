@@ -26,7 +26,7 @@ document.querySelectorAll('.fade').forEach(el=>observer.observe(el));
 const pdata=[
 ['01 · Estudio inicial','Entendemos tu hogar.','Analizamos vivienda, consumo y objetivos para encontrar la solución que mejor encaja.','https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=85'],
 ['02 · Propuesta personalizada','Diseñamos a medida.','Convertimos tus necesidades en una propuesta clara y adaptada.','https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=85'],
-['03 · Instalación','Lo hacemos realidad.','Coordinamos la instalación buscando seguridad, precisión y mínimas molestias.','https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1600&q=85'],
+['03 · Instalación','Lo hacemos realidad.','Coordinamos la instalación buscando seguridad, precisión y mínimas molestias.','assets/images/instalacion-ekinova.png'],
 ['04 · Puesta en marcha','Tu sistema empieza a trabajar.','Comprobamos el funcionamiento y te explicamos cómo aprovecharlo.','https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1600&q=85'],
 ['05 · Seguimiento','Seguimos a tu lado.','La instalación termina, pero la atención continúa.','https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1600&q=85']
 ];
