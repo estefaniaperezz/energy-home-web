@@ -252,7 +252,7 @@ h1 span{color:var(--gold2)}
   color:#fff;
 }
 .saving-breakdown strong span{display:inline;color:inherit;font-size:inherit;margin:0}
-.saving-cta{
+.savings-cta{
    margin-top:auto;
   align-self:stretch;
   transform:translateY(18px);
