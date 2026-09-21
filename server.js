@@ -6,6 +6,8 @@ const {URL}=require('url');
 
 const ROOT=__dirname;
 const PORT=process.env.PORT||3000;
+const geocodeCache=new Map();
+const pvgisCache=new Map();
 
 const mime={
   '.html':'text/html; charset=utf-8',
@@ -50,29 +52,60 @@ async function handleGeocode(reqUrl,res){
   const q=(reqUrl.searchParams.get('q')||'').trim();
   if(!q){send(res,400,JSON.stringify({error:'Falta la ubicación.'}));return;}
 
-  try{
-    const url=new URL('https://geocoding-api.open-meteo.com/v1/search');
-    url.searchParams.set('name',q);
-    url.searchParams.set('count','5');
-    url.searchParams.set('language','es');
-    url.searchParams.set('format','json');
-    url.searchParams.set('countryCode','ES');
+  const cacheKey=q.toLowerCase();
+  if(geocodeCache.has(cacheKey)){
+    send(res,200,JSON.stringify(geocodeCache.get(cacheKey)));
+    return;
+  }
 
-    const data=await getJson(url.toString(),{'User-Agent':'Ekinova-Klima-Estimator/0.1'});
-    const results=Array.isArray(data.results)?data.results:[];
-    if(!results.length){
-      send(res,404,JSON.stringify({error:'No hemos encontrado esa ubicación. Prueba con código postal o localidad.'}));
+  try{
+    const attempts=[q];
+    const withoutPostal=q.replace(/\b\d{5}\b/g,'').replace(/\s+/g,' ').trim();
+    if(withoutPostal && withoutPostal.toLowerCase()!==q.toLowerCase()) attempts.push(withoutPostal);
+
+    let best=null;
+    for(const attempt of attempts){
+      const url=new URL('https://nominatim.openstreetmap.org/search');
+      url.searchParams.set('q',attempt+', España');
+      url.searchParams.set('format','jsonv2');
+      url.searchParams.set('limit','1');
+      url.searchParams.set('countrycodes','es');
+      url.searchParams.set('addressdetails','1');
+
+      const data=await getJson(url.toString(),{
+        'User-Agent':'Ekinova-Klima-Estimator/0.1 (local prototype)',
+        'Accept':'application/json'
+      });
+
+      if(Array.isArray(data)&&data.length){
+        best=data[0];
+        break;
+      }
+    }
+
+    if(!best){
+      send(res,404,JSON.stringify({error:'No hemos encontrado esa ubicación. Prueba solo con la localidad, por ejemplo "Ávila".'}));
       return;
     }
 
-    const best=results[0];
-    send(res,200,JSON.stringify({
-      lat:Number(best.latitude),
-      lon:Number(best.longitude),
-      timezone:best.timezone||'Europe/Madrid',
-      label:[best.name,best.admin1,best.country].filter(Boolean).join(', ')
-    }));
+    const address=best.address||{};
+    const label=[
+      address.city||address.town||address.village||address.municipality||best.name,
+      address.state,
+      address.country
+    ].filter(Boolean).join(', ');
+
+    const result={
+      lat:Number(best.lat),
+      lon:Number(best.lon),
+      timezone:'Europe/Madrid',
+      label:label||best.display_name
+    };
+
+    geocodeCache.set(cacheKey,result);
+    send(res,200,JSON.stringify(result));
   }catch(error){
+    console.error('[GEOCODE]',error.message);
     send(res,502,JSON.stringify({error:'No hemos podido comprobar la ubicación ahora mismo.'}));
   }
 }
@@ -88,6 +121,12 @@ async function handlePvgis(reqUrl,res){
   }
 
   try{
+    const cacheKey=[lat,lon,aspect].join('|');
+    if(pvgisCache.has(cacheKey)){
+      send(res,200,JSON.stringify(pvgisCache.get(cacheKey)));
+      return;
+    }
+
     const url=new URL('https://re.jrc.ec.europa.eu/api/v5_3/seriescalc');
     const params={
       lat,lon,
@@ -106,8 +145,10 @@ async function handlePvgis(reqUrl,res){
     Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,String(v)));
 
     const data=await getJson(url.toString(),{'User-Agent':'Ekinova-Klima-Estimator/0.1'});
+    pvgisCache.set(cacheKey,data);
     send(res,200,JSON.stringify(data));
   }catch(error){
+    console.error('[PVGIS]',error.message);
     send(res,502,JSON.stringify({error:'PVGIS no ha podido calcular la producción ahora mismo.'}));
   }
 }
