@@ -168,68 +168,74 @@ async function geocodeLocation(query){
     return parsed;
   }
 
-  const url=new URL('https://nominatim.openstreetmap.org/search');
-  url.searchParams.set('q',clean+', España');
-  url.searchParams.set('format','jsonv2');
-  url.searchParams.set('limit','1');
-  url.searchParams.set('countrycodes','es');
+  const url=new URL('https://geocoding-api.open-meteo.com/v1/search');
+  url.searchParams.set('name',clean);
+  url.searchParams.set('count','5');
+  url.searchParams.set('language','es');
+  url.searchParams.set('format','json');
+  url.searchParams.set('countryCode','ES');
 
-  const response=await fetch(url.toString(),{headers:{Accept:'application/json'}});
+  const response=await fetch(url.toString());
   if(!response.ok) throw new Error('No hemos podido comprobar la ubicación.');
   const data=await response.json();
-  if(!data.length) throw new Error('No hemos encontrado esa ubicación. Prueba con código postal y localidad.');
+  const results=Array.isArray(data.results)?data.results:[];
+  if(!results.length) throw new Error('No hemos encontrado esa ubicación. Prueba con código postal o localidad.');
 
+  const best=results[0];
   const result={
-    lat:Number(data[0].lat),
-    lon:Number(data[0].lon),
-    label:data[0].display_name
+    lat:Number(best.latitude),
+    lon:Number(best.longitude),
+    timezone:best.timezone||'Europe/Madrid',
+    label:[best.name,best.admin1,best.country].filter(Boolean).join(', ')
   };
   geocodeCache.set(key,result);
   sessionStorage.setItem('ekinova-geocode-'+key,JSON.stringify(result));
   return result;
 }
 
-function pvgisUrl(lat,lon,aspect){
-  const url=new URL('https://re.jrc.ec.europa.eu/api/v5_3/seriescalc');
-  const params={
-    lat:lat,
-    lon:lon,
-    startyear:ESTIMATOR_ASSUMPTIONS.startYear,
-    endyear:ESTIMATOR_ASSUMPTIONS.endYear,
-    pvcalculation:1,
-    peakpower:1,
-    loss:ESTIMATOR_ASSUMPTIONS.systemLoss,
-    angle:ESTIMATOR_ASSUMPTIONS.referenceTilt,
-    aspect:aspect,
-    pvtechchoice:'crystSi2025',
-    mountingplace:'building',
-    usehorizon:1,
-    outputformat:'json'
-  };
-  Object.entries(params).forEach(([key,value])=>url.searchParams.set(key,value));
+function openMeteoArchiveUrl(lat,lon,azimuth,timezone){
+  const url=new URL('https://archive-api.open-meteo.com/v1/archive');
+  url.searchParams.set('latitude',lat);
+  url.searchParams.set('longitude',lon);
+  url.searchParams.set('start_date','2019-01-01');
+  url.searchParams.set('end_date','2023-12-31');
+  url.searchParams.set('hourly','global_tilted_irradiance');
+  url.searchParams.set('tilt',String(ESTIMATOR_ASSUMPTIONS.referenceTilt));
+  url.searchParams.set('azimuth',String(azimuth));
+  url.searchParams.set('timezone',timezone||'Europe/Madrid');
   return url.toString();
 }
 
-async function fetchPvgisSeries(lat,lon,aspect){
-  const response=await fetch(pvgisUrl(lat,lon,aspect));
-  if(!response.ok) throw new Error('PVGIS no ha podido devolver datos para esta ubicación.');
+async function fetchOpenMeteoSeries(lat,lon,azimuth,timezone){
+  const response=await fetch(openMeteoArchiveUrl(lat,lon,azimuth,timezone));
+  if(!response.ok) throw new Error('El servicio de datos solares no ha podido responder.');
   const data=await response.json();
-  const hourly=data&&data.outputs&&data.outputs.hourly;
-  if(!Array.isArray(hourly)||!hourly.length) throw new Error('PVGIS no ha devuelto una serie horaria válida.');
-  return hourly.map(row=>({time:String(row.time),P:Number(row.P)||0}));
+  const times=data&&data.hourly&&data.hourly.time;
+  const irradiance=data&&data.hourly&&data.hourly.global_tilted_irradiance;
+  if(!Array.isArray(times)||!Array.isArray(irradiance)||!times.length||times.length!==irradiance.length){
+    throw new Error('No hemos recibido una serie solar horaria válida.');
+  }
+
+  const performanceRatio=1-(ESTIMATOR_ASSUMPTIONS.systemLoss/100);
+  return times.map((time,index)=>({
+    time:String(time),
+    // GTI is the preceding-hour mean in W/m². For a 1 kWp array,
+    // one hour at 1000 W/m² is approximately 1 kWh before system losses.
+    P:(Number(irradiance[index])||0)*performanceRatio
+  }));
 }
 
-async function getSolarSeries(lat,lon,orientation){
-  const cacheKey=[lat.toFixed(4),lon.toFixed(4),orientation].join('|');
+async function getSolarSeries(lat,lon,orientation,timezone){
+  const cacheKey=[lat.toFixed(4),lon.toFixed(4),orientation,timezone||''].join('|');
   if(solarCache.has(cacheKey)) return solarCache.get(cacheKey);
 
   let series;
   if(orientation==='south'){
-    series=await fetchPvgisSeries(lat,lon,0);
+    series=await fetchOpenMeteoSeries(lat,lon,0,timezone);
   }else if(orientation==='eastwest'){
     const pair=await Promise.all([
-      fetchPvgisSeries(lat,lon,-90),
-      fetchPvgisSeries(lat,lon,90)
+      fetchOpenMeteoSeries(lat,lon,-90,timezone),
+      fetchOpenMeteoSeries(lat,lon,90,timezone)
     ]);
     const east=pair[0];
     const west=pair[1];
@@ -249,6 +255,7 @@ async function getSolarSeries(lat,lon,orientation){
   return series;
 }
 
+
 function annualYieldPerKwp(series){
   const years=new Map();
   series.forEach(row=>{
@@ -261,16 +268,15 @@ function annualYieldPerKwp(series){
   return values.reduce((a,b)=>a+b,0)/values.length;
 }
 
-function simulate(series,annualConsumption,peakPower,profileKey,prices,timezoneOffset){
+function simulate(series,annualConsumption,peakPower,profileKey,prices){
   const weights=CONSUMPTION_PROFILES[profileKey];
   const weightSum=weights.reduce((a,b)=>a+b,0);
   const years=new Map();
 
   series.forEach(row=>{
     const year=Number(row.time.slice(0,4));
-    const month=Number(row.time.slice(4,6))-1;
-    const utcHour=Number(row.time.slice(9,11));
-    const localHour=(utcHour+timezoneOffset+24)%24;
+    const month=Number(row.time.slice(5,7))-1;
+    const localHour=Number(row.time.slice(11,13));
     const dailyConsumption=annualConsumption/daysInYear(year);
     const consumption=dailyConsumption*(weights[localHour]/weightSum);
     const production=((row.P||0)/1000)*peakPower;
@@ -365,8 +371,8 @@ function renderEstimate(payload){
   }
   document.getElementById('resultSummary').textContent=summary;
 
-  let assumptions='Datos horarios de PVGIS '+ESTIMATOR_ASSUMPTIONS.startYear+'–'+ESTIMATOR_ASSUMPTIONS.endYear+
-    ', pérdidas de sistema del '+ESTIMATOR_ASSUMPTIONS.systemLoss+' %, inclinación de referencia '+ESTIMATOR_ASSUMPTIONS.referenceTilt+
+  let assumptions='Datos horarios históricos de irradiancia inclinada (Open-Meteo, 2019–2023), pérdidas de sistema del '+
+    ESTIMATOR_ASSUMPTIONS.systemLoss+' %, inclinación de referencia '+ESTIMATOR_ASSUMPTIONS.referenceTilt+
     '° y sin batería. El perfil de consumo es aproximado.';
 
   if(!payload.exactPrices){
@@ -379,7 +385,7 @@ function renderEstimate(payload){
   if(payload.shade==='unsure'){
     assumptions+=' No hemos podido confirmar sombras próximas, por eso reducimos la confianza del resultado.';
   }else{
-    assumptions+=' PVGIS considera el horizonte del terreno, pero esta estimación no sustituye una revisión de sombras de edificios, árboles o chimeneas.';
+    assumptions+=' Esta primera versión no modela sombras próximas de edificios, árboles o chimeneas; una revisión técnica sigue siendo necesaria.';
   }
 
   document.getElementById('assumptionText').textContent=assumptions;
@@ -471,17 +477,15 @@ async function runSolarEstimate(options={}){
   try{
     const location=await geocodeLocation(locationQuery);
     estimatorStatus.textContent='Calculando producción y cruce horario con tu consumo…';
-    const series=await getSolarSeries(location.lat,location.lon,orientation);
+    const series=await getSolarSeries(location.lat,location.lon,orientation,location.timezone);
 
     const yieldPerKwp=annualYieldPerKwp(series);
     const midConsumption=(consumption.min+consumption.max)/2;
     const peakPower=clamp(roundHalf((midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp),1.5,10);
-    const timezoneOffset=location.lon<-13?0:1;
-
     const candidates=consumption.min===consumption.max?[consumption.min]:[consumption.min,consumption.max];
     const scenarios=[];
     candidates.forEach(value=>{
-      scenarios.push(...simulate(series,value,peakPower,profile,prices,timezoneOffset));
+      scenarios.push(...simulate(series,value,peakPower,profile,prices));
     });
 
     const confidence=confidenceLabel(consumption.basis,shade,advanced,exactPrices);
@@ -503,7 +507,7 @@ async function runSolarEstimate(options={}){
   }catch(error){
     console.error(error);
     resetResultState();
-    estimatorStatus.textContent='No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada. Inténtalo de nuevo en unos minutos.';
+    estimatorStatus.textContent='No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada. Revisa la ubicación e inténtalo de nuevo.';
   }finally{
     estimateButton.disabled=false;
   }
