@@ -89,7 +89,7 @@ button,input,select{font:inherit}
   background:
     linear-gradient(90deg,rgba(8,7,6,.78) 0%,rgba(8,7,6,.43) 38%,rgba(8,7,6,.10) 70%),
     linear-gradient(0deg,rgba(8,7,6,.66) 0%,rgba(8,7,6,0) 48%),
-    url("https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=2200&q=90") center/cover;
+    url("../assets/images/hero-home-ekinova.png") center/cover;
   transition:border-radius .15s linear;
 }
 .hero-card:before{
@@ -425,7 +425,7 @@ h1{
 .contact-image{
   min-height:600px;background:
     linear-gradient(0deg,rgba(8,7,6,.15),rgba(8,7,6,.02)),
-    url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=88") center/cover;
+    url("../assets/images/vista-aerea-ekinova.png") center/cover;
   position:relative;
 }
 .contact-image .quote{position:absolute;left:36px;top:36px;font-size:32px;line-height:1.1;max-width:285px}
