@@ -43,29 +43,498 @@ document.querySelectorAll('.step').forEach(step=>{
   });
 });
 
-// Savings simulator — visual/orientative only
-const billInput=document.getElementById('bill');
-const homeType=document.getElementById('homeType');
+// Ekinova solar estimator — transparent, data-led prototype
+const estimatorForm=document.getElementById('solarEstimator');
+const estimateButton=document.getElementById('estimateButton');
+const estimatorStatus=document.getElementById('estimatorStatus');
+const solarLocation=document.getElementById('solarLocation');
+const annualKwhInput=document.getElementById('annualKwh');
+const quickBill=document.getElementById('quickBill');
+const quickBillValue=document.getElementById('quickBillValue');
+const kwhMode=document.getElementById('kwhMode');
+const billMode=document.getElementById('billMode');
+const resultEmpty=document.getElementById('resultEmpty');
+const resultData=document.getElementById('resultData');
+const needsStudy=document.getElementById('needsStudy');
+const realDataToggle=document.getElementById('realDataToggle');
+const realDataPanel=document.getElementById('realDataPanel');
+const realDataForm=document.getElementById('realDataForm');
 
-function updateSavings(){
-  if(!billInput || !homeType) return;
+const ESTIMATOR_ASSUMPTIONS={
+  startYear:2019,
+  endYear:2023,
+  systemLoss:14,
+  referenceTilt:30,
+  targetCoverage:.85,
+  buyPrice:[.15,.25],
+  exportPrice:[.03,.10],
+  billVariableShare:[.60,.80]
+};
 
-  const bill=Number(billInput.value);
-  const factor=Number(homeType.value);
-  const savingRate=.48*factor;
-  const monthly=Math.max(0,Math.round(bill*savingRate));
-  const solar=Math.max(0,bill-monthly);
-  const annual=monthly*12;
+const CONSUMPTION_PROFILES={
+  day:[.35,.32,.30,.30,.36,.55,1.05,1.35,1.35,1.35,1.40,1.45,1.45,1.40,1.35,1.35,1.45,1.55,1.65,1.45,1.10,.82,.58,.42],
+  balanced:[.48,.43,.40,.39,.43,.62,1.05,1.30,1.10,.95,.90,.92,.95,.95,.95,1.05,1.35,1.75,2.00,1.90,1.55,1.15,.82,.60],
+  night:[.62,.55,.50,.47,.50,.68,1.10,1.35,.88,.62,.55,.52,.50,.52,.58,.78,1.28,1.95,2.35,2.40,2.05,1.55,1.05,.78]
+};
 
-  document.getElementById('billValue').textContent=bill;
-  document.getElementById('currentBill').textContent=bill;
-  document.getElementById('monthlySaving').textContent=monthly;
-  document.getElementById('solarBill').textContent=solar;
-  document.getElementById('annualSaving').textContent=annual.toLocaleString('es-ES');
+let consumptionMode='kwh';
+let lastEstimateContext=null;
+const solarCache=new Map();
+const geocodeCache=new Map();
+
+document.querySelectorAll('[data-consumption-mode]').forEach(button=>{
+  button.addEventListener('click',()=>{
+    consumptionMode=button.dataset.consumptionMode;
+    document.querySelectorAll('[data-consumption-mode]').forEach(b=>b.classList.toggle('active',b===button));
+    kwhMode.hidden=consumptionMode!=='kwh';
+    billMode.hidden=consumptionMode!=='bill';
+  });
+});
+
+if(quickBill){
+  quickBill.addEventListener('input',()=>{
+    quickBillValue.textContent=quickBill.value;
+  });
 }
 
-if(billInput && homeType){
-  billInput.addEventListener('input',updateSavings);
-  homeType.addEventListener('change',updateSavings);
-  updateSavings();
+function selectedValue(name){
+  const el=document.querySelector('input[name="'+name+'"]:checked');
+  return el?el.value:null;
+}
+
+function clamp(value,min,max){
+  return Math.min(max,Math.max(min,value));
+}
+
+function roundHalf(value){
+  return Math.round(value*2)/2;
+}
+
+function roundTen(value){
+  return Math.round(value/10)*10;
+}
+
+function roundFifty(value){
+  return Math.round(value/50)*50;
+}
+
+function formatInt(value){
+  return new Intl.NumberFormat('es-ES',{maximumFractionDigits:0}).format(Math.max(0,Math.round(value)));
+}
+
+function formatDecimal(value,digits=1){
+  return new Intl.NumberFormat('es-ES',{minimumFractionDigits:digits,maximumFractionDigits:digits}).format(value);
+}
+
+function formatRange(min,max,rounder=roundFifty){
+  const a=rounder(min);
+  const b=rounder(max);
+  return a===b?formatInt(a):formatInt(a)+'–'+formatInt(b);
+}
+
+function daysInYear(year){
+  return new Date(year,1,29).getMonth()===1?366:365;
+}
+
+function getQuickConsumption(){
+  if(consumptionMode==='kwh'){
+    const value=Number(annualKwhInput.value);
+    if(!Number.isFinite(value)||value<500) throw new Error('Introduce tu consumo anual en kWh.');
+    return {min:value,max:value,basis:'kwh'};
+  }
+
+  const bill=Number(quickBill.value);
+  const annualSpend=bill*12;
+  const min=annualSpend*ESTIMATOR_ASSUMPTIONS.billVariableShare[0]/ESTIMATOR_ASSUMPTIONS.buyPrice[1];
+  const max=annualSpend*ESTIMATOR_ASSUMPTIONS.billVariableShare[1]/ESTIMATOR_ASSUMPTIONS.buyPrice[0];
+  return {
+    min:clamp(min,700,30000),
+    max:clamp(max,700,30000),
+    basis:'bill',
+    bill
+  };
+}
+
+async function geocodeLocation(query){
+  const clean=query.trim();
+  if(!clean) throw new Error('Introduce el código postal o la localidad.');
+  const key=clean.toLowerCase();
+  if(geocodeCache.has(key)) return geocodeCache.get(key);
+
+  const cached=sessionStorage.getItem('ekinova-geocode-'+key);
+  if(cached){
+    const parsed=JSON.parse(cached);
+    geocodeCache.set(key,parsed);
+    return parsed;
+  }
+
+  const url=new URL('https://nominatim.openstreetmap.org/search');
+  url.searchParams.set('q',clean+', España');
+  url.searchParams.set('format','jsonv2');
+  url.searchParams.set('limit','1');
+  url.searchParams.set('countrycodes','es');
+
+  const response=await fetch(url.toString(),{headers:{Accept:'application/json'}});
+  if(!response.ok) throw new Error('No hemos podido comprobar la ubicación.');
+  const data=await response.json();
+  if(!data.length) throw new Error('No hemos encontrado esa ubicación. Prueba con código postal y localidad.');
+
+  const result={
+    lat:Number(data[0].lat),
+    lon:Number(data[0].lon),
+    label:data[0].display_name
+  };
+  geocodeCache.set(key,result);
+  sessionStorage.setItem('ekinova-geocode-'+key,JSON.stringify(result));
+  return result;
+}
+
+function pvgisUrl(lat,lon,aspect){
+  const url=new URL('https://re.jrc.ec.europa.eu/api/v5_3/seriescalc');
+  const params={
+    lat:lat,
+    lon:lon,
+    startyear:ESTIMATOR_ASSUMPTIONS.startYear,
+    endyear:ESTIMATOR_ASSUMPTIONS.endYear,
+    pvcalculation:1,
+    peakpower:1,
+    loss:ESTIMATOR_ASSUMPTIONS.systemLoss,
+    angle:ESTIMATOR_ASSUMPTIONS.referenceTilt,
+    aspect:aspect,
+    pvtechchoice:'crystSi2025',
+    mountingplace:'building',
+    usehorizon:1,
+    outputformat:'json'
+  };
+  Object.entries(params).forEach(([key,value])=>url.searchParams.set(key,value));
+  return url.toString();
+}
+
+async function fetchPvgisSeries(lat,lon,aspect){
+  const response=await fetch(pvgisUrl(lat,lon,aspect));
+  if(!response.ok) throw new Error('PVGIS no ha podido devolver datos para esta ubicación.');
+  const data=await response.json();
+  const hourly=data&&data.outputs&&data.outputs.hourly;
+  if(!Array.isArray(hourly)||!hourly.length) throw new Error('PVGIS no ha devuelto una serie horaria válida.');
+  return hourly.map(row=>({time:String(row.time),P:Number(row.P)||0}));
+}
+
+async function getSolarSeries(lat,lon,orientation){
+  const cacheKey=[lat.toFixed(4),lon.toFixed(4),orientation].join('|');
+  if(solarCache.has(cacheKey)) return solarCache.get(cacheKey);
+
+  let series;
+  if(orientation==='south'){
+    series=await fetchPvgisSeries(lat,lon,0);
+  }else if(orientation==='eastwest'){
+    const pair=await Promise.all([
+      fetchPvgisSeries(lat,lon,-90),
+      fetchPvgisSeries(lat,lon,90)
+    ]);
+    const east=pair[0];
+    const west=pair[1];
+    const length=Math.min(east.length,west.length);
+    series=new Array(length);
+    for(let i=0;i<length;i++){
+      series[i]={
+        time:east[i].time,
+        P:(east[i].P+west[i].P)/2
+      };
+    }
+  }else{
+    throw new Error('Necesitamos una orientación calculable.');
+  }
+
+  solarCache.set(cacheKey,series);
+  return series;
+}
+
+function annualYieldPerKwp(series){
+  const years=new Map();
+  series.forEach(row=>{
+    const year=Number(row.time.slice(0,4));
+    const value=(row.P||0)/1000;
+    years.set(year,(years.get(year)||0)+value);
+  });
+  const values=[...years.values()].filter(v=>v>0);
+  if(!values.length) throw new Error('No se ha podido calcular la producción anual.');
+  return values.reduce((a,b)=>a+b,0)/values.length;
+}
+
+function simulate(series,annualConsumption,peakPower,profileKey,prices,timezoneOffset){
+  const weights=CONSUMPTION_PROFILES[profileKey];
+  const weightSum=weights.reduce((a,b)=>a+b,0);
+  const years=new Map();
+
+  series.forEach(row=>{
+    const year=Number(row.time.slice(0,4));
+    const month=Number(row.time.slice(4,6))-1;
+    const utcHour=Number(row.time.slice(9,11));
+    const localHour=(utcHour+timezoneOffset+24)%24;
+    const dailyConsumption=annualConsumption/daysInYear(year);
+    const consumption=dailyConsumption*(weights[localHour]/weightSum);
+    const production=((row.P||0)/1000)*peakPower;
+
+    if(!years.has(year)){
+      years.set(year,Array.from({length:12},()=>({production:0,self:0,exported:0,grid:0})));
+    }
+    const bucket=years.get(year)[month];
+    bucket.production+=production;
+    bucket.self+=Math.min(production,consumption);
+    bucket.exported+=Math.max(0,production-consumption);
+    bucket.grid+=Math.max(0,consumption-production);
+  });
+
+  const results=[];
+  years.forEach((months,year)=>{
+    let production=0;
+    let self=0;
+    let exported=0;
+    let savingLow=0;
+    let savingHigh=0;
+
+    months.forEach(month=>{
+      production+=month.production;
+      self+=month.self;
+      exported+=month.exported;
+
+      const selfLow=month.self*prices.buy[0];
+      const selfHigh=month.self*prices.buy[1];
+      const exportLow=Math.min(month.exported*prices.exported[0],month.grid*prices.buy[0]);
+      const exportHigh=Math.min(month.exported*prices.exported[1],month.grid*prices.buy[1]);
+
+      savingLow+=selfLow+exportLow;
+      savingHigh+=selfHigh+exportHigh;
+    });
+
+    results.push({year,production,self,exported,savingLow,savingHigh});
+  });
+
+  return results;
+}
+
+function confidenceLabel(basis,shade,advanced,exactPrices){
+  if(shade==='unsure') return 'Precisión baja';
+  if(basis==='bill') return 'Precisión media-baja';
+  if(advanced&&exactPrices) return 'Precisión media-alta';
+  return 'Precisión media';
+}
+
+function showStudyNeeded(title,text){
+  resultEmpty.hidden=true;
+  resultData.hidden=true;
+  needsStudy.hidden=false;
+  document.getElementById('needsStudyTitle').textContent=title;
+  document.getElementById('needsStudyText').textContent=text;
+  realDataPanel.hidden=true;
+}
+
+function resetResultState(){
+  needsStudy.hidden=true;
+  resultData.hidden=true;
+  resultEmpty.hidden=false;
+}
+
+function renderEstimate(payload){
+  const all=payload.scenarios;
+  const savingLow=Math.min(...all.map(r=>r.savingLow));
+  const savingHigh=Math.max(...all.map(r=>r.savingHigh));
+  const productionLow=Math.min(...all.map(r=>r.production));
+  const productionHigh=Math.max(...all.map(r=>r.production));
+  const selfLow=Math.min(...all.map(r=>r.self));
+  const selfHigh=Math.max(...all.map(r=>r.self));
+  const exportLow=Math.min(...all.map(r=>r.exported));
+  const exportHigh=Math.max(...all.map(r=>r.exported));
+
+  resultEmpty.hidden=true;
+  needsStudy.hidden=true;
+  resultData.hidden=false;
+
+  document.getElementById('savingMin').textContent=formatInt(roundTen(savingLow));
+  document.getElementById('savingMax').textContent=formatInt(roundTen(savingHigh));
+  document.getElementById('productionRange').textContent=formatRange(productionLow,productionHigh);
+  document.getElementById('selfUseRange').textContent=formatRange(selfLow,selfHigh);
+  document.getElementById('exportRange').textContent=formatRange(exportLow,exportHigh);
+  document.getElementById('systemSize').textContent='≈ '+formatDecimal(payload.peakPower,1);
+  document.getElementById('confidenceBadge').textContent=payload.confidence;
+
+  const shortLocation=payload.location.label.split(',').slice(0,2).join(', ');
+  let summary='Simulación preliminar para '+shortLocation+' con una instalación de '+formatDecimal(payload.peakPower,1)+' kWp.';
+  if(payload.consumption.basis==='bill'){
+    summary+=' Como solo conocemos el importe de la factura, estimamos un consumo amplio de '+formatRange(payload.consumption.min,payload.consumption.max,roundFifty)+' kWh/año.';
+  }
+  document.getElementById('resultSummary').textContent=summary;
+
+  let assumptions='Datos horarios de PVGIS '+ESTIMATOR_ASSUMPTIONS.startYear+'–'+ESTIMATOR_ASSUMPTIONS.endYear+
+    ', pérdidas de sistema del '+ESTIMATOR_ASSUMPTIONS.systemLoss+' %, inclinación de referencia '+ESTIMATOR_ASSUMPTIONS.referenceTilt+
+    '° y sin batería. El perfil de consumo es aproximado.';
+
+  if(!payload.exactPrices){
+    assumptions+=' Para convertir kWh en euros usamos un rango de referencia de '+formatDecimal(payload.prices.buy[0],2)+'–'+formatDecimal(payload.prices.buy[1],2)+
+      ' €/kWh para energía comprada y '+formatDecimal(payload.prices.exported[0],2)+'–'+formatDecimal(payload.prices.exported[1],2)+' €/kWh para excedentes.';
+  }else{
+    assumptions+=' El cálculo económico usa los precios que has introducido.';
+  }
+
+  if(payload.shade==='unsure'){
+    assumptions+=' No hemos podido confirmar sombras próximas, por eso reducimos la confianza del resultado.';
+  }else{
+    assumptions+=' PVGIS considera el horizonte del terreno, pero esta estimación no sustituye una revisión de sombras de edificios, árboles o chimeneas.';
+  }
+
+  document.getElementById('assumptionText').textContent=assumptions;
+
+  lastEstimateContext=payload;
+}
+
+function advancedPrices(){
+  const buyRaw=document.getElementById('realBuyPrice').value.trim();
+  const exportRaw=document.getElementById('realExportPrice').value.trim();
+  const buy=buyRaw?Number(buyRaw):null;
+  const exported=exportRaw?Number(exportRaw):null;
+
+  return {
+    buy:Number.isFinite(buy)&&buy>0?[buy,buy]:ESTIMATOR_ASSUMPTIONS.buyPrice,
+    exported:Number.isFinite(exported)&&exported>=0?[exported,exported]:ESTIMATOR_ASSUMPTIONS.exportPrice,
+    exact:Number.isFinite(buy)&&buy>0&&Number.isFinite(exported)&&exported>=0
+  };
+}
+
+async function runSolarEstimate(options={}){
+  if(!estimatorForm) return;
+
+  const advanced=Boolean(options.advanced);
+  const orientation=selectedValue('orientation');
+  const profile=selectedValue('profile');
+  const shade=selectedValue('shade');
+
+  if(!orientation){estimatorStatus.textContent='Selecciona la orientación del tejado.';return;}
+  if(!profile){estimatorStatus.textContent='Indica cuándo consumes más electricidad.';return;}
+  if(!shade){estimatorStatus.textContent='Indica si hay sombras próximas al tejado.';return;}
+
+  if(orientation==='north'){
+    estimatorStatus.textContent='';
+    showStudyNeeded(
+      'Con orientación norte no queremos adivinar.',
+      'El resultado cambia mucho según la inclinación y el tipo de cubierta. Antes de enseñarte una cifra necesitamos confirmar si el tejado es plano, inclinado y cómo podrían colocarse realmente los paneles.'
+    );
+    return;
+  }
+
+  if(orientation==='unknown'){
+    estimatorStatus.textContent='';
+    showStudyNeeded(
+      'Necesitamos conocer la orientación.',
+      'Sin una orientación aproximada el rango sería demasiado amplio para ser útil. Puedes consultarla con una brújula del móvil o pedirnos que la revisemos contigo.'
+    );
+    return;
+  }
+
+  if(shade==='yes'){
+    estimatorStatus.textContent='';
+    showStudyNeeded(
+      'Las sombras necesitan una revisión real.',
+      'Sabemos que existen obstáculos próximos, pero no cuánto afectan ni a qué horas. Aplicar un descuento genérico sería inventar precisión, así que preferimos revisar la cubierta antes de darte una cifra.'
+    );
+    return;
+  }
+
+  let consumption;
+  let prices={buy:ESTIMATOR_ASSUMPTIONS.buyPrice,exported:ESTIMATOR_ASSUMPTIONS.exportPrice};
+  let exactPrices=false;
+
+  try{
+    if(advanced){
+      const real=Number(document.getElementById('realAnnualKwh').value);
+      if(!Number.isFinite(real)||real<500) throw new Error('Introduce el consumo anual de tu factura.');
+      consumption={min:real,max:real,basis:'kwh'};
+      const custom=advancedPrices();
+      prices={buy:custom.buy,exported:custom.exported};
+      exactPrices=custom.exact;
+    }else{
+      consumption=getQuickConsumption();
+    }
+  }catch(error){
+    estimatorStatus.textContent=error.message;
+    return;
+  }
+
+  const locationQuery=solarLocation.value.trim();
+  if(!locationQuery){
+    estimatorStatus.textContent='Introduce el código postal o la localidad.';
+    return;
+  }
+
+  estimateButton.disabled=true;
+  estimatorStatus.textContent='Consultando ubicación y datos solares históricos…';
+
+  try{
+    const location=await geocodeLocation(locationQuery);
+    estimatorStatus.textContent='Calculando producción y cruce horario con tu consumo…';
+    const series=await getSolarSeries(location.lat,location.lon,orientation);
+
+    const yieldPerKwp=annualYieldPerKwp(series);
+    const midConsumption=(consumption.min+consumption.max)/2;
+    const peakPower=clamp(roundHalf((midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp),1.5,10);
+    const timezoneOffset=location.lon<-13?0:1;
+
+    const candidates=consumption.min===consumption.max?[consumption.min]:[consumption.min,consumption.max];
+    const scenarios=[];
+    candidates.forEach(value=>{
+      scenarios.push(...simulate(series,value,peakPower,profile,prices,timezoneOffset));
+    });
+
+    const confidence=confidenceLabel(consumption.basis,shade,advanced,exactPrices);
+    renderEstimate({
+      scenarios,
+      peakPower,
+      confidence,
+      location,
+      orientation,
+      profile,
+      shade,
+      consumption,
+      prices,
+      exactPrices,
+      advanced
+    });
+
+    estimatorStatus.textContent='Estimación calculada. Te mostramos un rango para no fingir una precisión que no tenemos.';
+  }catch(error){
+    console.error(error);
+    resetResultState();
+    estimatorStatus.textContent='No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada. Inténtalo de nuevo en unos minutos.';
+  }finally{
+    estimateButton.disabled=false;
+  }
+}
+
+if(estimatorForm){
+  estimatorForm.addEventListener('submit',event=>{
+    event.preventDefault();
+    runSolarEstimate();
+  });
+}
+
+if(realDataToggle){
+  realDataToggle.addEventListener('click',()=>{
+    realDataPanel.hidden=!realDataPanel.hidden;
+    if(!realDataPanel.hidden){
+      let suggested='';
+      if(lastEstimateContext){
+        suggested=Math.round((lastEstimateContext.consumption.min+lastEstimateContext.consumption.max)/2);
+      }else if(annualKwhInput&&annualKwhInput.value){
+        suggested=annualKwhInput.value;
+      }
+      document.getElementById('realAnnualKwh').value=suggested;
+      realDataPanel.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  });
+}
+
+if(realDataForm){
+  realDataForm.addEventListener('submit',event=>{
+    event.preventDefault();
+    runSolarEstimate({advanced:true});
+  });
 }
