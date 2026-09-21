@@ -545,7 +545,9 @@ async function runSolarEstimate(options={}){
   }catch(error){
     console.error(error);
     resetResultState();
-    estimatorStatus.textContent='No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada. Revisa la ubicación e inténtalo de nuevo.';
+    estimatorStatus.textContent=error && error.message
+      ? error.message
+      : 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.';
   }finally{
     estimateButton.disabled=false;
   }
