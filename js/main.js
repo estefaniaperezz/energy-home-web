@@ -84,7 +84,7 @@ document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
 
     history.replaceState(null,'','#servicios');
     if(isMobile){
-      animatePageScroll(targetY,1200);
+      animatePageScroll(targetY,900);
     }else{
       // Desktop navigation should feel immediate: jump straight to the composed Services state.
       window.scrollTo({top:targetY,behavior:'auto'});
