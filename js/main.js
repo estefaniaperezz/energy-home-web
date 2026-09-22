@@ -20,19 +20,23 @@ function updateStory(){
 addEventListener('scroll',updateStory,{passive:true});
 addEventListener('resize',updateStory);
 updateStory();
-// Keep the Servicios anchor slightly above the reveal panel so navigation never overshoots into the next section.
+// Servicios lives inside the animated hero story.
+// Clicking it should reveal that panel fully and stop there, matching the natural scroll state.
 document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
   link.addEventListener('click',event=>{
     const services=document.getElementById('servicios');
-    if(!services) return;
+    if(!services || !story) return;
 
     event.preventDefault();
 
-    const navHeight=nav ? nav.offsetHeight : (window.innerWidth<=760 ? 72 : 88);
-    const leadIn=Math.min(220,window.innerHeight*.22);
     const storyTop=story.getBoundingClientRect().top+window.scrollY;
-    const servicesLayoutTop=storyTop+services.offsetTop;
-    const targetY=Math.max(0,servicesLayoutTop-navHeight-leadIn);
+    const storyTravel=Math.max(1,story.offsetHeight-window.innerHeight);
+
+    // updateStory() reaches its fully revealed state when raw progress is about .85.
+    // Land a touch beyond that so the services panel is fully open but the next section
+    // has not started entering the viewport.
+    const revealProgress=window.innerWidth<=760 ? .88 : .87;
+    const targetY=Math.max(0,storyTop+(storyTravel*revealProgress));
 
     history.replaceState(null,'','#servicios');
     window.scrollTo({top:targetY,behavior:'smooth'});
