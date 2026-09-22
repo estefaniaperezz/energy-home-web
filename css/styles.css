@@ -61,7 +61,7 @@ button{
 .brand-logo{
   display:block;
   width:auto;
-  height:68px;
+  height:76px;
   object-fit:contain;
 }
 .navlinks{display:flex;gap:28px;font-size:13px;color:#25313a}
@@ -478,6 +478,52 @@ h1{
 .contact-copy h2{font-size:56px;line-height:.98;letter-spacing:-.045em;font-weight:400;margin:7px 0 18px}
 .contact-copy h2 span{color:var(--brand-green-light)}
 .contact-copy p{color:#CCD5DA;line-height:1.55}
+.contact-direct{
+  display:flex;
+  gap:10px;
+  align-items:stretch;
+  flex-wrap:wrap;
+  margin:22px 0 6px;
+}
+.contact-whatsapp,.contact-email-link{
+  display:inline-flex;
+  align-items:center;
+  min-height:52px;
+  border-radius:14px;
+  transition:.22s ease;
+}
+.contact-whatsapp{
+  gap:11px;
+  padding:10px 15px;
+  background:var(--brand-green);
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+}
+.contact-whatsapp svg{
+  width:22px;
+  height:22px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  flex:0 0 auto;
+}
+.contact-whatsapp span{display:grid;gap:1px}
+.contact-whatsapp small{font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.82}
+.contact-whatsapp strong{font-size:13px}
+.contact-whatsapp:hover{transform:translateY(-2px);background:#009568}
+.contact-email-link{
+  gap:16px;
+  justify-content:space-between;
+  padding:10px 15px;
+  border:1px solid rgba(255,255,255,.18);
+  color:#DCE4E8;
+  font-size:12px;
+}
+.contact-email-link:hover{border-color:rgba(121,216,181,.55);color:#fff}
+
 .form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
 .form input,.form textarea{
   width:100%;min-width:0;border:1px solid rgba(255,255,255,.16);
@@ -508,6 +554,18 @@ h1{
   pointer-events:none;
 }
 .footer{background:var(--brand-blue-deep);color:#A7B2B8;padding:28px 0;font-size:12px}
+.footer-in{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.footer-socials{display:flex;align-items:center;gap:9px}
+.social-placeholder{
+  width:34px;height:34px;border-radius:50%;
+  display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.14);
+  color:var(--brand-green-light);
+  background:rgba(255,255,255,.035);
+  opacity:.72;
+}
+.social-placeholder svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7}
+.social-placeholder:nth-child(2) svg{fill:currentColor;stroke:none}
 
 /* simple scroll reveal for later sections */
 .fade{opacity:0;transform:translateY(20px);transition:.7s ease}
@@ -545,6 +603,9 @@ h1{
   .saving-field-row{display:block}.saving-field select{width:100%;margin-top:10px}
   .saving-breakdown{grid-template-columns:1fr}
   .form{grid-template-columns:1fr}.contact-copy{padding:32px 20px}.contact-copy h2{font-size:44px}
+  .contact-direct{display:grid;grid-template-columns:1fr}
+  .contact-whatsapp,.contact-email-link{width:100%}
+  .footer-in{align-items:flex-start;flex-direction:column;gap:16px}
 }
 
 /* Keep the sticky result card from covering the expanded real-data form */
