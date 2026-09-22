@@ -213,6 +213,7 @@ const geocodeCache=new Map();
 
 document.querySelectorAll('[data-consumption-mode]').forEach(button=>{
   button.addEventListener('click',()=>{
+    clearEstimatorError();
     consumptionMode=button.dataset.consumptionMode;
     document.querySelectorAll('[data-consumption-mode]').forEach(b=>b.classList.toggle('active',b===button));
     kwhMode.hidden=consumptionMode!=='kwh';
@@ -229,6 +230,38 @@ if(quickBill){
 function selectedValue(name){
   const el=document.querySelector('input[name="'+name+'"]:checked');
   return el?el.value:null;
+}
+
+function clearEstimatorError(){
+  if(!estimatorStatus) return;
+  if(estimatorStatus.dataset.state==='error'){
+    estimatorStatus.textContent='';
+    estimatorStatus.dataset.state='';
+  }
+  estimatorForm?.querySelectorAll('[aria-invalid="true"]').forEach(el=>el.removeAttribute('aria-invalid'));
+}
+
+function showEstimatorError(message,field=null){
+  if(!estimatorStatus) return;
+  estimatorStatus.textContent=message;
+  estimatorStatus.dataset.state='error';
+  estimateButton.disabled=false;
+
+  if(field){
+    field.setAttribute('aria-invalid','true');
+    requestAnimationFrame(()=>{
+      field.focus({preventScroll:true});
+      const navOffset=window.innerWidth<=760?82:102;
+      const rect=field.getBoundingClientRect();
+      const targetY=window.scrollY+rect.top-navOffset-90;
+      window.scrollTo({top:Math.max(0,targetY),behavior:'smooth'});
+    });
+  }
+}
+
+if(estimatorForm){
+  estimatorForm.addEventListener('input',clearEstimatorError);
+  estimatorForm.addEventListener('change',clearEstimatorError);
 }
 
 function clamp(value,min,max){
@@ -659,9 +692,9 @@ async function runSolarEstimate(options={}){
   const profile=selectedValue('profile');
   const shade=selectedValue('shade');
 
-  if(!orientation){estimatorStatus.textContent='Selecciona la orientación del tejado.';return;}
-  if(!profile){estimatorStatus.textContent='Indica cuándo consumes más electricidad.';return;}
-  if(!shade){estimatorStatus.textContent='Indica si hay sombras próximas al tejado.';return;}
+  if(!orientation){showEstimatorError('Selecciona la orientación del tejado.');return;}
+  if(!profile){showEstimatorError('Indica cuándo consumes más electricidad.');return;}
+  if(!shade){showEstimatorError('Indica si hay sombras próximas al tejado.');return;}
 
   if(!advanced && orientation==='north'){
     estimatorStatus.textContent='';
@@ -731,13 +764,22 @@ async function runSolarEstimate(options={}){
       consumption=getQuickConsumption();
     }
   }catch(error){
-    estimatorStatus.textContent=error.message;
+    const field=advanced ? document.getElementById('realAnnualKwh') : (consumptionMode==='kwh' ? annualKwhInput : null);
+    showEstimatorError(error.message,field);
     return;
   }
 
   const locationQuery=solarLocation.value.trim();
   if(!locationQuery){
-    estimatorStatus.textContent='Introduce el código postal o la localidad.';
+    showEstimatorError('Introduce el código postal o la localidad.',solarLocation);
+    return;
+  }
+
+  // If the user types only digits, treat it as a Spanish postal code.
+  // A 4-digit value is a common missing-leading-zero typo and should be fixable in place,
+  // not sent to geocoding and left in a dead-end error state.
+  if(/^\d+$/.test(locationQuery) && locationQuery.length!==5){
+    showEstimatorError('El código postal debe tener 5 cifras. Revísalo y vuelve a calcular.',solarLocation);
     return;
   }
 
@@ -809,9 +851,10 @@ async function runSolarEstimate(options={}){
   }catch(error){
     console.error(error);
     resetResultState();
-    estimatorStatus.textContent=error && error.message
+    const message=error && error.message
       ? error.message
       : 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.';
+    showEstimatorError(message,solarLocation);
   }finally{
     estimateButton.disabled=false;
   }
