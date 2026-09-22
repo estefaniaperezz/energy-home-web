@@ -38,22 +38,27 @@ button,input,select{font:inherit}
 .nav{
   position:fixed;z-index:70;left:0;right:0;top:0;height:88px;
   display:flex;align-items:center;
+  background:rgba(255,255,255,.97);
+  color:var(--brand-dark);
+  border-bottom:1px solid rgba(15,76,129,.10);
+  box-shadow:0 8px 26px rgba(15,76,129,.06);
   transition:.35s ease;
 }
 .nav.scrolled{
-  background:rgba(11,10,9,.70);
+  background:rgba(255,255,255,.97);
   backdrop-filter:blur(18px);
-  border-bottom:1px solid rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(15,76,129,.12);
+  box-shadow:0 10px 30px rgba(15,76,129,.08);
 }
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:28px}
 .brand{
   display:flex;
   align-items:center;
   flex:0 0 auto;
-  padding:7px 12px;
-  border-radius:16px;
-  background:rgba(255,255,255,.94);
-  box-shadow:0 10px 30px rgba(0,0,0,.12);
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
 }
 .brand-logo{
   display:block;
@@ -61,14 +66,23 @@ button,input,select{font:inherit}
   height:68px;
   object-fit:contain;
 }
-.navlinks{display:flex;gap:28px;font-size:13px}
-.navlinks a{opacity:.86;transition:.2s}
-.navlinks a:hover{opacity:1;color:var(--gold2)}
+.navlinks{display:flex;gap:28px;font-size:13px;color:#25313a}
+.navlinks a{opacity:.82;transition:.2s}
+.navlinks a:hover{opacity:1;color:var(--brand-blue)}
 .nav-cta{
-  padding:13px 20px;border:1px solid rgba(255,255,255,.48);
-  border-radius:999px;font-size:13px;transition:.25s;
+  padding:13px 20px;
+  border:1px solid var(--brand-blue);
+  background:var(--brand-blue);
+  color:#fff;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  transition:.25s;
 }
-.nav-cta:hover{background:rgba(255,255,255,.08)}
+.nav-cta:hover{
+  background:#0b3f6b;
+  border-color:#0b3f6b;
+}
 
 /* INTRO STORY STAGE */
 .story{
@@ -704,9 +718,15 @@ h1{
   .shell{width:min(100% - 28px,1240px)}
 
   /* Navigation: keep brand + one useful action visible */
-  .nav{height:72px;background:rgba(11,10,9,.76);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
+  .nav{
+    height:72px;
+    background:rgba(255,255,255,.98);
+    color:var(--brand-dark);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(15,76,129,.10);
+  }
   .nav-in{gap:10px}
-  .brand{min-width:0;padding:5px 8px;border-radius:12px}
+  .brand{min-width:0;padding:0;border-radius:0}
   .brand-logo{height:50px;max-width:220px}
   .brand small{display:none}
   .navlinks{display:none}
