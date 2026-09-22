@@ -211,7 +211,7 @@ h1{
   z-index:10;
 }
 .benefits{
-  padding:70px 0 84px;
+  padding:42px 0 84px;
   display:grid;grid-template-columns:1.2fr repeat(4,1fr);gap:25px;
 }
 .benefits h2{font-size:40px;line-height:1.02;letter-spacing:-.045em;font-weight:430;margin:6px 0}
