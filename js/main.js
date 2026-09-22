@@ -35,8 +35,9 @@ const processSteps=[...document.querySelectorAll('.step')];
 
 processSteps.forEach(step=>{
   const d=pdata[+step.dataset.step];
-  // Mobile uses the same image inside the active accordion card.
-  step.style.setProperty('--step-image',`url("${d[3]}")`);
+  // Resolve to an absolute URL so local preview and GitHub Pages behave the same.
+  const stepImageUrl=new URL(d[3],document.baseURI).href;
+  step.style.setProperty('--step-image',`url("${stepImageUrl}")`);
 
   step.addEventListener('click',()=>{
     processSteps.forEach(s=>s.classList.remove('active'));
