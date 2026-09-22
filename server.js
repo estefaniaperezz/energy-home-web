@@ -30,21 +30,48 @@ function send(res,status,body,type='application/json; charset=utf-8'){
   res.end(body);
 }
 
-function getJson(url,headers={}){
+function getJson(url,headers={},timeoutMs=15000){
   return new Promise((resolve,reject)=>{
-    https.get(url,{headers},response=>{
+    let settled=false;
+    const fail=error=>{
+      if(settled) return;
+      settled=true;
+      reject(error);
+    };
+
+    const request=https.get(url,{headers},response=>{
       let body='';
       response.setEncoding('utf8');
-      response.on('data',chunk=>body+=chunk);
+
+      response.on('data',chunk=>{
+        body+=chunk;
+        if(body.length>12*1024*1024){
+          request.destroy();
+          fail(new Error('Respuesta externa demasiado grande'));
+        }
+      });
+
       response.on('end',()=>{
+        if(settled) return;
         if(response.statusCode<200||response.statusCode>=300){
-          reject(new Error('HTTP '+response.statusCode+' al consultar '+new URL(url).hostname));
+          fail(new Error('HTTP '+response.statusCode+' al consultar '+new URL(url).hostname));
           return;
         }
-        try{resolve(JSON.parse(body));}
-        catch(error){reject(new Error('Respuesta JSON no válida'));}
+        try{
+          const parsed=JSON.parse(body);
+          settled=true;
+          resolve(parsed);
+        }catch(error){
+          fail(new Error('Respuesta JSON no válida'));
+        }
       });
-    }).on('error',reject);
+    });
+
+    request.setTimeout(timeoutMs,()=>{
+      request.destroy();
+      fail(new Error('Tiempo de espera agotado'));
+    });
+    request.on('error',fail);
   });
 }
 
@@ -102,6 +129,10 @@ async function handleGeocode(reqUrl,res){
       label:label||best.display_name
     };
 
+    if(!Number.isFinite(result.lat)||!Number.isFinite(result.lon)||!result.label){
+      throw new Error('Respuesta de geocodificación incompleta');
+    }
+
     geocodeCache.set(cacheKey,result);
     send(res,200,JSON.stringify(result));
   }catch(error){
@@ -118,6 +149,10 @@ async function handlePvgis(reqUrl,res){
 
   if(!Number.isFinite(lat)||!Number.isFinite(lon)||!Number.isFinite(aspect)||!Number.isFinite(angle)){
     send(res,400,JSON.stringify({error:'Parámetros solares incompletos.'}));
+    return;
+  }
+  if(lat<-90||lat>90||lon<-180||lon>180||aspect<-180||aspect>180||angle<0||angle>90){
+    send(res,400,JSON.stringify({error:'Parámetros solares fuera de rango.'}));
     return;
   }
 
@@ -146,6 +181,9 @@ async function handlePvgis(reqUrl,res){
     Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,String(v)));
 
     const data=await getJson(url.toString(),{'User-Agent':'Ekinova-Klima-Estimator/0.1'});
+    if(!data || !data.outputs || !Array.isArray(data.outputs.hourly) || !data.outputs.hourly.length){
+      throw new Error('PVGIS devolvió una serie vacía o inválida');
+    }
     pvgisCache.set(cacheKey,data);
     send(res,200,JSON.stringify(data));
   }catch(error){
