@@ -1336,3 +1336,55 @@ h1{
     white-space:nowrap;
   }
 }
+
+
+/* FINAL MOBILE ACTIVE-STATE OVERRIDES */
+@media(max-width:760px){
+  .choice-card input:checked + span,
+  .choice-card input:checked + span:hover,
+  .choice-card:active > span{
+    background:var(--brand-blue-deep) !important;
+    border-color:rgba(255,255,255,.78) !important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,255,255,.06) !important;
+  }
+
+  .choice-card input:checked + span b,
+  .choice-card input:checked + span small{
+    color:#fff !important;
+  }
+
+  .mode-btn.active,
+  .mode-btn.active:hover,
+  .mode-btn:active{
+    background:var(--brand-blue-deep) !important;
+    border-color:rgba(255,255,255,.78) !important;
+    color:#fff !important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,255,255,.06) !important;
+  }
+
+  #proceso .step.active,
+  #proceso .step.active:hover,
+  #proceso .step.active:active{
+    background:var(--brand-blue-deep) !important;
+    border-color:rgba(255,255,255,.78) !important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 20px rgba(255,255,255,.06) !important;
+  }
+
+  #proceso .step.active small,
+  #proceso .step.active h4{
+    color:#fff !important;
+  }
+
+  .social-placeholder{
+    width:50px !important;
+    height:50px !important;
+    color:#fff !important;
+    opacity:1 !important;
+    border-color:rgba(255,255,255,.30) !important;
+  }
+
+  .social-placeholder svg{
+    width:24px !important;
+    height:24px !important;
+  }
+}
