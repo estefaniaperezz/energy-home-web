@@ -112,7 +112,7 @@ button{
     scale(calc(1 - var(--p) * .055));
   transform-origin:center top;
   box-shadow:none;
-  border:1px solid rgba(255,255,255,.10);
+  border:0;
   background:
     linear-gradient(90deg,rgba(8,7,6,.78) 0%,rgba(8,7,6,.43) 38%,rgba(8,7,6,.10) 70%),
     linear-gradient(0deg,rgba(8,7,6,.66) 0%,rgba(8,7,6,0) 48%),
@@ -244,7 +244,7 @@ h1{
   background:
     radial-gradient(circle at 80% 12%,rgba(0,166,118,.14),transparent 30%),
     radial-gradient(circle at 15% 75%,rgba(15,76,129,.18),transparent 30%),
-    linear-gradient(180deg,#0B2239 0%,#081A2A 100%);
+    linear-gradient(180deg,#0B2239 0%,#0B2239 100%);
   color:#fff;
   padding:110px 0;
 }
