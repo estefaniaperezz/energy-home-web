@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=20260922-2">
+<link rel="stylesheet" href="css/styles.css?v=20260922-3">
 </head>
 <body>
 
@@ -35,7 +35,18 @@
       <a href="#proceso">Cómo trabajamos</a>
       <a href="#contacto">Contacto</a>
     </nav>
-    <a href="#contacto" class="nav-cta">Solicitar estudio →</a>
+    <div class="nav-actions">
+      <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="#contacto" class="nav-cta">Solicitar estudio →</a>
+    </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Navegación móvil">
+      <a href="#inicio">Inicio</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#proceso">Cómo trabajamos</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
   </div>
 </header>
 
@@ -451,6 +462,11 @@
   </section>
 </main>
 
+  <div class="whatsapp-float" role="img" aria-label="Vista previa del botón de WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.8a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.3-4.7A8.5 8.5 0 1 1 20.5 11.8Z"/><path d="M8.1 7.8c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.8 1.9c.1.3.1.5-.1.7l-.6.8c-.2.2-.1.4 0 .6.5 1 1.3 1.8 2.2 2.4.9.6 1.6.8 1.9.9.3.1.5 0 .7-.2l.8-.9c.2-.2.4-.3.7-.2l1.8.8c.3.1.5.3.5.5 0 .2-.1 1.4-.8 2-.7.6-1.5.9-2.5.8-1-.1-3.2-.6-5.4-2.5-1.8-1.5-3-3.4-3.3-4.5-.4-1.1-.1-2.2.4-2.8Z"/></svg>
+    <span>WhatsApp</span>
+  </div>
+
 <footer class="footer">
   <div class="shell footer-in">
     <div class="footer-copy">
@@ -468,6 +484,6 @@
   </div>
 </footer>
 
-<script src="js/main.js?v=20260922-7"></script>
+<script src="js/main.js?v=20260922-8"></script>
 </body>
 </html>
