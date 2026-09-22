@@ -375,11 +375,18 @@ async function geocodeLocation(query){
   const key=clean.toLowerCase();
   if(geocodeCache.has(key)) return geocodeCache.get(key);
 
-  const cached=sessionStorage.getItem('ekinova-geocode-'+key);
-  if(cached){
-    const parsed=JSON.parse(cached);
-    geocodeCache.set(key,parsed);
-    return parsed;
+  try{
+    const cached=sessionStorage.getItem('ekinova-geocode-'+key);
+    if(cached){
+      const parsed=JSON.parse(cached);
+      if(parsed && Number.isFinite(parsed.lat) && Number.isFinite(parsed.lon) && parsed.label){
+        geocodeCache.set(key,parsed);
+        return parsed;
+      }
+      sessionStorage.removeItem('ekinova-geocode-'+key);
+    }
+  }catch(error){
+    // Storage is an optimization only. Private mode/corrupt cache must not block calculation.
   }
 
   let response;
@@ -409,8 +416,20 @@ async function geocodeLocation(query){
       null
     );
   }
+  if(!result || !Number.isFinite(Number(result.lat)) || !Number.isFinite(Number(result.lon)) || !result.label){
+    throw estimatorValidationError(
+      'El servicio de ubicación ha devuelto datos incompletos. Vuelve a intentarlo en unos segundos.',
+      null
+    );
+  }
+  result.lat=Number(result.lat);
+  result.lon=Number(result.lon);
   geocodeCache.set(key,result);
-  sessionStorage.setItem('ekinova-geocode-'+key,JSON.stringify(result));
+  try{
+    sessionStorage.setItem('ekinova-geocode-'+key,JSON.stringify(result));
+  }catch(error){
+    // Ignore storage failures: the in-memory cache and current result are enough.
+  }
   return result;
 }
 
