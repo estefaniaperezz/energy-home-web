@@ -463,8 +463,9 @@ h1{
   .story{padding-top:68px}.sticky{top:68px;height:calc(100vh - 68px)}
   .hero-card{width:calc(100% - 16px);height:calc(100% - 12px);border-radius:24px}
   .hero-content{padding:56px 22px 54px}
-  .scroll-hint{bottom:5px;font-size:10px}
-  .scroll-hint i{height:30px;margin-top:5px}
+  .hero-content>div:first-child{transform:translateY(-46px)}
+  .scroll-hint{bottom:10px;font-size:10px;white-space:nowrap}
+  .scroll-hint i{height:26px;margin-top:5px}
   h1{font-size:56px}
   .lede{font-size:16px}
   .reveal-panel{width:calc(100% - 18px);padding:32px 18px 38px;min-height:68vh}
