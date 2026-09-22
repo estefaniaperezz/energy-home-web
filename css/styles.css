@@ -89,7 +89,7 @@ button,input,select{font:inherit}
   background:
     linear-gradient(90deg,rgba(8,7,6,.78) 0%,rgba(8,7,6,.43) 38%,rgba(8,7,6,.10) 70%),
     linear-gradient(0deg,rgba(8,7,6,.66) 0%,rgba(8,7,6,0) 48%),
-    url("../assets/images/hero-home-ekinova.png") center/cover;
+    url("../assets/images/hero-home-ekinova.webp") center/cover;
   transition:border-radius .15s linear;
 }
 .hero-card:before{
@@ -435,7 +435,7 @@ h1{
   inset:-5% -4%;
   background:
     linear-gradient(0deg,rgba(8,7,6,.15),rgba(8,7,6,.02)),
-    url("../assets/images/vista-aerea-ekinova.png") center/cover;
+    url("../assets/images/vista-aerea-ekinova.webp") center/cover;
   transform:translate3d(0,var(--contact-image-y),0) scale(1.02);
   will-change:transform;
   pointer-events:none;
