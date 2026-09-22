@@ -21,7 +21,21 @@ addEventListener('scroll',updateStory,{passive:true});
 addEventListener('resize',updateStory);
 updateStory();
 // Servicios lives inside the animated hero story.
-// Clicking it should reveal that panel fully and stop there, matching the natural scroll state.
+// Navigation should stop at the composed "services reveal" state, not at the raw anchor.
+function animatePageScroll(targetY,duration){
+  const startY=window.scrollY;
+  const distance=targetY-startY;
+  const startTime=performance.now();
+  const ease=t=>t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+
+  function frame(now){
+    const progress=Math.min(1,(now-startTime)/duration);
+    window.scrollTo(0,startY+(distance*ease(progress)));
+    if(progress<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
 document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
   link.addEventListener('click',event=>{
     const services=document.getElementById('servicios');
@@ -31,15 +45,15 @@ document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
 
     const storyTop=story.getBoundingClientRect().top+window.scrollY;
     const storyTravel=Math.max(1,story.offsetHeight-window.innerHeight);
+    const isMobile=window.innerWidth<=760;
 
-    // updateStory() reaches its fully revealed state when raw progress is about .85.
-    // Land a touch beyond that so the services panel is fully open but the next section
-    // has not started entering the viewport.
-    const revealProgress=window.innerWidth<=760 ? .83 : .91;
+    // Mobile stops earlier so the panel sits below the header with a strip of hero still visible,
+    // matching the intended editorial composition.
+    const revealProgress=isMobile ? .76 : .91;
     const targetY=Math.max(0,storyTop+(storyTravel*revealProgress));
 
     history.replaceState(null,'','#servicios');
-    window.scrollTo({top:targetY,behavior:'smooth'});
+    animatePageScroll(targetY,isMobile ? 1050 : 760);
   });
 });
 
