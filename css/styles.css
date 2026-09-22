@@ -205,11 +205,11 @@ h1{
   margin-bottom:38px;
 }
 .reveal-top h2{
-  font-size:clamp(36px,4.2vw,58px);
-  line-height:1.02;letter-spacing:-.045em;font-weight:400;margin:8px 0 0;
+  font-size:clamp(32px,3.4vw,48px);
+  line-height:1.04;letter-spacing:-.04em;font-weight:400;margin:8px 0 0;
 }
 .reveal-top h2 span{color:var(--brand-green)}
-.reveal-top p{color:#667178;line-height:1.6;max-width:480px;font-size:14px}
+.reveal-top p{color:#667178;line-height:1.6;max-width:480px;font-size:15px}
 .service-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .service-card{
   border-radius:20px;
@@ -233,10 +233,10 @@ h1{
   z-index:10;
 }
 .benefits{
-  padding:42px 0 84px;
-  display:grid;grid-template-columns:1.2fr repeat(4,1fr);gap:25px;
+  padding:56px 0 92px;
+  display:grid;grid-template-columns:1.2fr repeat(4,1fr);gap:28px;
 }
-.benefits h2{font-size:34px;line-height:1.06;letter-spacing:-.035em;font-weight:400;margin:8px 0}
+.benefits h2{font-size:clamp(32px,3.4vw,48px);line-height:1.04;letter-spacing:-.04em;font-weight:400;margin:8px 0}
 .benefits h2 span{color:var(--brand-green)}
 .benefit{border-left:1px solid rgba(0,0,0,.12);padding-left:22px}
 .benefit-icon{width:28px;height:28px;color:var(--brand-blue);margin-bottom:8px}
@@ -447,9 +447,9 @@ h1{
 
 .dark-section{background:var(--brand-blue-deep);color:#fff;padding:105px 0}
 .section-head{display:flex;justify-content:space-between;gap:40px;align-items:end;margin-bottom:38px}
-.section-head h2{font-size:clamp(34px,4vw,54px);line-height:1.04;letter-spacing:-.04em;font-weight:400;margin:8px 0}
+.section-head h2{font-size:clamp(32px,3.4vw,48px);line-height:1.04;letter-spacing:-.04em;font-weight:400;margin:8px 0}
 .section-head h2 span{color:#fff}
-.section-head p{color:var(--muted);line-height:1.6;max-width:450px;font-size:14px}
+.section-head p{color:var(--muted);line-height:1.6;max-width:450px;font-size:15px}
 
 .process-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 .process-visual{
@@ -493,9 +493,9 @@ h1{
   overflow:hidden;
 }
 .contact-copy{padding:48px}
-.contact-copy h2{font-size:46px;line-height:1.03;letter-spacing:-.038em;font-weight:400;margin:9px 0 16px}
+.contact-copy h2{font-size:clamp(32px,3.4vw,48px);line-height:1.04;letter-spacing:-.04em;font-weight:400;margin:9px 0 16px}
 .contact-copy h2 span{color:#fff}
-.contact-copy p{color:#CCD5DA;line-height:1.6;font-size:14px}
+.contact-copy p{color:#CCD5DA;line-height:1.6;font-size:15px}
 
 .form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
 .form input,.form textarea{
@@ -648,7 +648,7 @@ h1{
   .section-head{display:block}.section-head p{margin-top:14px}
   .saving-field-row{display:block}.saving-field select{width:100%;margin-top:10px}
   .saving-breakdown{grid-template-columns:1fr}
-  .form{grid-template-columns:1fr}.contact-copy{padding:32px 20px}.contact-copy h2{font-size:38px}
+  .form{grid-template-columns:1fr}.contact-copy{padding:32px 20px}.contact-copy h2{font-size:clamp(32px,8.5vw,40px)}
   .footer-in{align-items:flex-start;flex-direction:column;gap:16px}
   .whatsapp-float{
     right:14px;
@@ -924,10 +924,10 @@ h1{
     margin-bottom:26px;
   }
   .reveal-top h2{
-    font-size:clamp(37px,10.5vw,50px);
-    line-height:1;
+    font-size:clamp(32px,8.5vw,40px);
+    line-height:1.05;
   }
-  .reveal-top p{font-size:14px;margin:0;line-height:1.55}
+  .reveal-top p{font-size:14px;margin:0;line-height:1.6}
   .service-grid{grid-template-columns:1fr;gap:12px}
   .service-card{display:grid;grid-template-columns:118px minmax(0,1fr);border-radius:17px}
   .service-card img{height:100%;min-height:138px}
@@ -941,8 +941,8 @@ h1{
     grid-template-columns:1fr;
     gap:0;
   }
-  .benefits>div:first-child{grid-column:auto;padding-bottom:28px}
-  .benefits h2{font-size:clamp(34px,9vw,43px)}
+  .benefits>div:first-child{grid-column:auto;padding-bottom:34px}
+  .benefits h2{font-size:clamp(32px,8.5vw,40px)}
   .benefit{
     border-left:0;
     border-top:1px solid rgba(0,0,0,.12);
@@ -965,7 +965,7 @@ h1{
     margin-bottom:28px;
   }
   .section-head h2{
-    font-size:clamp(38px,10.5vw,50px);
+    font-size:clamp(32px,8.5vw,40px);
     margin-top:8px;
   }
   .section-head p{
@@ -1065,7 +1065,7 @@ h1{
   /* Contact */
   .contact-box{grid-template-columns:1fr;border-radius:22px}
   .contact-copy{padding:30px 20px}
-  .contact-copy h2{font-size:clamp(39px,10.5vw,50px)}
+  .contact-copy h2{font-size:clamp(32px,8.5vw,40px)}
   .form{grid-template-columns:1fr;gap:9px}
   .form input,.form select,.form textarea{
     grid-column:1/-1!important;
