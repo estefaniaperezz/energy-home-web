@@ -83,7 +83,12 @@ document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
     const targetY=Math.max(0,storyTop+(storyTravel*revealProgress));
 
     history.replaceState(null,'','#servicios');
-    animatePageScroll(targetY,isMobile ? 1200 : 760);
+    if(isMobile){
+      animatePageScroll(targetY,1200);
+    }else{
+      // Desktop navigation should feel immediate: jump straight to the composed Services state.
+      window.scrollTo({top:targetY,behavior:'auto'});
+    }
   });
 });
 
