@@ -84,3 +84,13 @@ El servidor sirve la propia web y consulta PVGIS desde Node, evitando el bloqueo
 
 ### Arquitectura prevista para producción
 La versión pública deberá mover las rutas `/api/geocode` y `/api/pvgis` a una función backend/serverless (por ejemplo, Vercel/Netlify/Cloudflare) para que la web publicada pueda mantener la misma lógica sin exponer claves ni depender de CORS.
+
+#### Prioridad importante para producción: caché
+Implementar caché en backend para geocodificación y consultas repetidas a PVGIS. Si varios usuarios consultan la misma zona y parámetros solares, reutilizar temporalmente una respuesta válida en lugar de repetir la petición externa. Objetivos:
+- reducir llamadas a servicios externos;
+- acelerar la respuesta de la calculadora;
+- disminuir consumo y coste de funciones serverless;
+- mejorar la resiliencia ante picos de tráfico;
+- evitar consultas duplicadas innecesarias.
+
+La política de expiración de caché deberá definirse antes del despliegue según el tipo de dato: la geocodificación puede reutilizarse durante mucho más tiempo que otros datos operativos.
