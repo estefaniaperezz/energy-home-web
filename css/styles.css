@@ -177,7 +177,7 @@ h1{
   background:#F4F7F6;
   color:var(--ink);
   padding:54px 52px 60px;
-  box-shadow:0 -30px 80px rgba(0,0,0,.20);
+  box-shadow:none;
   z-index:6;
   min-height:61vh;
 }
