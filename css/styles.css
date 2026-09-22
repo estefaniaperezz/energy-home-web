@@ -146,10 +146,11 @@ h1{
 .actions{display:flex;gap:13px;flex-wrap:wrap;margin-top:31px}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  border:0;
   border-radius:999px;padding:15px 24px;font-weight:650;font-size:14px;
   transition:.25s ease;
 }
-.btn.gold{background:linear-gradient(135deg,#12b783,var(--brand-green));color:#fff;box-shadow:0 10px 30px rgba(0,166,118,.20)}
+.btn.gold{background:var(--brand-green);color:#fff;box-shadow:0 10px 30px rgba(0,166,118,.18)}
 .btn.ghost{border:1px solid rgba(255,255,255,.55)}
 .btn:hover{transform:translateY(-2px)}
 .side-index{justify-self:end;width:235px;align-self:end;margin-bottom:55px}
