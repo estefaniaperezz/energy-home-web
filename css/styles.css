@@ -140,9 +140,10 @@ h1{
   line-height:.99;letter-spacing:-.06em;font-weight:400;
   margin:18px 0 24px;max-width:820px;
 }
+.hero-content .eyebrow{color:#fff}
 .hero-title-line{display:block;color:inherit}
 .hero-title-second{margin-top:.10em}
-.hero-title-accent{color:var(--brand-green-light)}
+.hero-title-accent{color:#fff}
 .lede{font-size:18px;line-height:1.55;max-width:620px;color:#EDF2F4}
 .actions{display:flex;gap:13px;flex-wrap:wrap;margin-top:31px}
 .btn{
@@ -161,7 +162,7 @@ h1{
 .btn:hover{transform:translateY(-2px)}
 .side-index{justify-self:end;width:235px;align-self:end;margin-bottom:55px}
 .index-row{padding:15px 0;border-bottom:1px solid var(--line);text-transform:uppercase;font-size:13px;letter-spacing:.08em}
-.index-row small{display:block;color:var(--brand-green);font-size:10px;margin-bottom:5px}
+.index-row small{display:block;color:#fff;font-size:10px;margin-bottom:5px}
 .scroll-hint{
   position:absolute;left:50%;bottom:22px;transform:translateX(-50%);
   font-size:11px;color:#DDE5E9;text-align:center;letter-spacing:.05em;
@@ -312,7 +313,7 @@ h1{
   background:rgba(8,139,73,.06);
 }
 .mode-btn.active{
-  color:#10231d;
+  color:#fff;
   background:var(--brand-green);
   border-color:var(--brand-green);
   font-weight:700;
@@ -447,14 +448,20 @@ h1{
     url("https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=85") center/cover;
 }
 .process-copy{position:absolute;left:28px;right:28px;bottom:28px}
+.process-copy .eyebrow{color:#fff}
 .process-copy h3{font-size:34px;margin:7px 0 10px}
 .process-copy p{line-height:1.5;color:#DCE4E8}
 .steps{display:grid;gap:10px}
 .step{
   border:1px solid var(--line);border-radius:18px;padding:18px 20px;cursor:pointer;
-  background:rgba(255,255,255,.025);transition:.25s;
+  background:var(--brand-blue-deep);transition:.25s;
 }
-.step.active{border-color:rgba(8,139,73,.62);background:rgba(8,139,73,.08);transform:translateX(-6px)}
+.step.active{
+  border-color:var(--brand-green);
+  background:var(--brand-blue-deep);
+  box-shadow:0 0 0 1px rgba(8,139,73,.22),0 0 24px rgba(8,139,73,.14);
+  transform:translateX(-6px)
+}
 .step-top{display:flex;align-items:center;gap:14px}
 .step small{color:var(--brand-green)}
 .step h4{margin:0;font-size:18px}
