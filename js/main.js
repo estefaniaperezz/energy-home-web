@@ -255,7 +255,7 @@ function invalidatePendingEstimate(){
 
 function clearEstimatorError(){
   [estimatorStatus,realDataStatus].forEach(status=>{
-    if(status && status.dataset.state==='error'){
+    if(status && ['error','loading','success'].includes(status.dataset.state)){
       status.textContent='';
       status.dataset.state='';
     }
@@ -893,12 +893,18 @@ async function runSolarEstimate(options={}){
   }
 
   setEstimatorBusy(true);
-  if(activeStatus) activeStatus.textContent='Consultando ubicación y datos solares históricos…';
+  if(activeStatus){
+    activeStatus.textContent='Consultando ubicación y datos solares históricos…';
+    activeStatus.dataset.state='loading';
+  }
 
   try{
     const location=await geocodeLocation(locationQuery);
     if(runId!==estimateRunId) return;
-    if(activeStatus) activeStatus.textContent='Calculando producción y cruce horario con tu consumo…';
+    if(activeStatus){
+      activeStatus.textContent='Calculando producción y cruce horario con tu consumo…';
+      activeStatus.dataset.state='loading';
+    }
     const simulationOrientation=advanced?roofData.orientation:orientation;
     const simulationAngle=advanced?roofData.angle:ESTIMATOR_ASSUMPTIONS.referenceTilt;
     if(simulationOrientation==='unknown'){
@@ -970,7 +976,7 @@ async function runSolarEstimate(options={}){
 
     if(activeStatus){
       activeStatus.textContent='Estimación calculada. Te mostramos un rango para no fingir una precisión que no tenemos.';
-      activeStatus.dataset.state='';
+      activeStatus.dataset.state='success';
     }
   }catch(error){
     if(runId!==estimateRunId) return;
