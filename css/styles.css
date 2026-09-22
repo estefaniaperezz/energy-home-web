@@ -38,15 +38,15 @@ button,input,select{font:inherit}
   display:flex;align-items:center;
   background:#fff;
   color:var(--brand-dark);
-  border-bottom:1px solid rgba(15,76,129,.10);
-  box-shadow:0 8px 26px rgba(15,76,129,.06);
+  border-bottom:0;
+  box-shadow:none;
   transition:.35s ease;
 }
 .nav.scrolled{
   background:#fff;
   backdrop-filter:blur(18px);
-  border-bottom:1px solid rgba(15,76,129,.12);
-  box-shadow:0 10px 30px rgba(15,76,129,.08);
+  border-bottom:0;
+  box-shadow:none;
 }
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:28px}
 .brand{
