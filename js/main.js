@@ -46,7 +46,7 @@ processSteps.forEach(step=>{
     document.getElementById('procEye').textContent=current[0];
     document.getElementById('procTitle').textContent=current[1];
     document.getElementById('procText').textContent=current[2];
-    visual.style.backgroundImage=`linear-gradient(0deg,rgba(8,7,6,.68),rgba(8,7,6,.05)),url('${current[3]}')`;
+    visual.style.backgroundImage=`linear-gradient(0deg,rgba(11,34,57,.72),rgba(11,34,57,.08)),url('${current[3]}')`;
   });
 });
 
