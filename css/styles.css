@@ -386,9 +386,21 @@ h1{
 }
 .result-orbit:before{inset:12px}.result-orbit:after{inset:28px}
 .result-orbit span{position:absolute;width:10px;height:10px;background:#fff;border-radius:50%;top:16px;right:17px;box-shadow:0 0 24px rgba(255,255,255,.35);gap:10px;margin-top:28px}
+.result-empty-points{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0;
+  margin-top:18px;
+}
 .result-empty-points span{
-  position:relative;padding:10px 0 10px 22px;border-top:1px solid rgba(255,255,255,.09);
-  color:#C4CDD2;font-size:12px
+  display:block;
+  min-width:0;
+  position:relative;
+  padding:10px 0 10px 22px;
+  border-top:1px solid rgba(255,255,255,.09);
+  color:#C4CDD2;
+  font-size:12px;
+  line-height:1.45;
 }
 .result-empty-points span:before{content:"";position:absolute;left:1px;top:16px;width:6px;height:6px;border-radius:50%;background:#fff}
 .result-topline{display:flex;align-items:center;justify-content:space-between;gap:16px}
