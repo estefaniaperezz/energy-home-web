@@ -65,7 +65,7 @@ function updateContactReveal(){
   if(!desktop||reducedMotion){
     contactCopy.style.transform='';
     contactCopy.style.opacity='';
-    contactImage.style.backgroundPosition='';
+    contactImage.style.removeProperty('--contact-image-y');
     return;
   }
 
@@ -77,11 +77,11 @@ function updateContactReveal(){
 
   const lift=36*(1-p);
   const opacity=.38+(.62*p);
-  const imageY=46+(8*p);
+  const imageY=10-(20*p);
 
   contactCopy.style.transform='translateY('+lift.toFixed(1)+'px)';
   contactCopy.style.opacity=opacity.toFixed(3);
-  contactImage.style.backgroundPosition='center '+imageY.toFixed(2)+'%';
+  contactImage.style.setProperty('--contact-image-y',imageY.toFixed(1)+'px');
 }
 
 addEventListener('scroll',updateContactReveal,{passive:true});
