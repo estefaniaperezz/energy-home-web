@@ -367,6 +367,7 @@ function getQuickConsumption(){
 
 const IS_LOCAL_PREVIEW=location.hostname==='localhost'||location.hostname==='127.0.0.1';
 const IS_GITHUB_PAGES=location.hostname.endsWith('.github.io');
+const IS_STATIC_LOCAL_PREVIEW=IS_LOCAL_PREVIEW && location.port && location.port!=='3000';
 const API_BASE=IS_LOCAL_PREVIEW ? 'http://localhost:3000/api' : '/api';
 
 async function geocodeLocation(query){
@@ -387,7 +388,9 @@ async function geocodeLocation(query){
     response=await fetch(API_BASE+'/geocode?q='+encodeURIComponent(clean));
   }catch(error){
     throw estimatorValidationError(
-      'No hemos podido conectar con el servicio de ubicación. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.',
+      IS_STATIC_LOCAL_PREVIEW
+        ? 'La calculadora necesita el servidor local. Ejecuta "node server.js" y abre http://localhost:3000 para probarla completa.'
+        : 'No hemos podido conectar con el servicio de ubicación. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.',
       null
     );
   }
@@ -455,7 +458,11 @@ async function fetchPvgisSeries(lat,lon,aspect,timezone,angle=ESTIMATOR_ASSUMPTI
       '&angle='+encodeURIComponent(angle)
     );
   }catch(error){
-    throw new Error('No hemos podido conectar con el servicio de cálculo solar. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.');
+    throw new Error(
+      IS_STATIC_LOCAL_PREVIEW
+        ? 'La calculadora necesita el servidor local. Ejecuta "node server.js" y abre http://localhost:3000 para probarla completa.'
+        : 'No hemos podido conectar con el servicio de cálculo solar. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.'
+    );
   }
 
   if(!response.ok){
