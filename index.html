@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0d0c0b" />
 <title>Ekinova Klima — Energía y climatización eficiente</title>
-<meta name="description" content="Prototipo de home con transición narrativa al hacer scroll." />
+<meta name="description" content="Ekinova Klima diseña e instala soluciones de energía y climatización eficiente para tu hogar: energía solar, suelo radiante y climatización a medida." />
+<meta property="og:title" content="Ekinova Klima — Energía y climatización eficiente" />
+<meta property="og:description" content="Soluciones de energía solar, suelo radiante y climatización eficiente diseñadas para tu hogar." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -408,13 +412,27 @@
           <h2>Hablemos de <span>tu proyecto.</span></h2>
           <p>Cuéntanos qué necesitas y te asesoraremos con una propuesta a medida.</p>
           <form class="form" onsubmit="event.preventDefault();document.getElementById('thanks').textContent='Formulario disponible próximamente.'">
-            <input placeholder="Nombre *" required>
-            <input placeholder="Teléfono *" required>
-            <input type="email" placeholder="Email *" style="grid-column:1/-1" required>
-            <select style="grid-column:1/-1"><option>Tipo de proyecto *</option><option>Placas solares</option><option>Suelo radiante</option><option>Climatización</option></select>
-            <textarea placeholder="Mensaje (opcional)"></textarea>
+            <label class="sr-only" for="contactName">Nombre</label>
+            <input id="contactName" name="name" autocomplete="name" placeholder="Nombre *" required>
+
+            <label class="sr-only" for="contactPhone">Teléfono</label>
+            <input id="contactPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Teléfono *" required>
+
+            <label class="sr-only" for="contactEmail">Email</label>
+            <input id="contactEmail" name="email" type="email" autocomplete="email" placeholder="Email *" style="grid-column:1/-1" required>
+
+            <label class="sr-only" for="contactProject">Tipo de proyecto</label>
+            <select id="contactProject" name="project" style="grid-column:1/-1" required>
+              <option value="" selected disabled>Tipo de proyecto *</option>
+              <option value="solar">Placas solares</option>
+              <option value="underfloor">Suelo radiante</option>
+              <option value="climate">Climatización</option>
+            </select>
+
+            <label class="sr-only" for="contactMessage">Mensaje</label>
+            <textarea id="contactMessage" name="message" placeholder="Mensaje (opcional)"></textarea>
             <button class="btn gold" type="submit">Solicitar presupuesto →</button>
-            <span id="thanks" style="align-self:center;color:#cfc5ba;font-size:12px"></span>
+            <span id="thanks" role="status" aria-live="polite" style="align-self:center;color:#cfc5ba;font-size:12px"></span>
           </form>
         </div>
         <div class="contact-image" aria-hidden="true"></div>
