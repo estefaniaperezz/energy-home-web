@@ -1,12 +1,20 @@
 :root{
-  --bg:#0d0c0b;
-  --bg2:#17130f;
-  --cream:#f4efe7;
-  --ink:#15130f;
-  --text:#fbf8f3;
-  --muted:#bdb3a7;
-  --gold:#e8b75b;
-  --gold2:#f6d794;
+  --brand-blue:#0F4C81;
+  --brand-green:#00A676;
+  --brand-dark:#1C1C1C;
+  --brand-gray:#7D868C;
+  --brand-white:#FFFFFF;
+
+  --bg:#101820;
+  --bg2:#13202b;
+  --cream:#f5f7f6;
+  --ink:#1C1C1C;
+  --text:#FFFFFF;
+  --muted:#b9c2c8;
+
+  /* Keep legacy variable names temporarily so the current layout remains stable */
+  --gold:#00A676;
+  --gold2:#79d8b5;
   --line:rgba(255,255,255,.16);
   --p:0;
 }
@@ -15,10 +23,10 @@
 html{scroll-behavior:smooth}
 body{
   margin:0;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-family:"Montserrat",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   background:
-    radial-gradient(circle at 50% -15%,rgba(232,183,91,.10),transparent 34%),
-    linear-gradient(180deg,#14110e 0%,#0d0c0b 32%,#0d0c0b 100%);
+    radial-gradient(circle at 50% -15%,rgba(0,166,118,.10),transparent 34%),
+    linear-gradient(180deg,#142331 0%,#101820 32%,#101820 100%);
   color:var(--text);
   overflow-x:hidden;
 }
@@ -40,15 +48,26 @@ button,input,select{font:inherit}
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:28px}
 .brand{display:flex;align-items:center;gap:13px}
 .brand-mark{
-  width:45px;height:45px;border:1px solid rgba(255,255,255,.75);border-radius:50%;
+  width:45px;height:45px;border:2px solid rgba(255,255,255,.92);border-radius:50%;
   position:relative;
+  box-shadow:inset 0 0 0 3px rgba(15,76,129,.34);
+}
+.brand-mark:before{
+  content:"";
+  position:absolute;
+  left:9px;right:9px;top:17px;
+  height:8px;
+  border-top:2px solid var(--brand-blue);
+  border-bottom:2px solid var(--brand-green);
+  border-radius:50%;
+  transform:rotate(-8deg);
 }
 .brand-mark:after{
-  content:"";position:absolute;width:22px;height:1px;background:var(--gold);
-  right:2px;top:12px;transform:rotate(-23deg);transform-origin:right center;
+  content:"";position:absolute;width:18px;height:2px;background:var(--brand-green);
+  right:4px;top:10px;transform:rotate(-28deg);transform-origin:right center;
 }
-.brand strong{font-size:19px;font-weight:500;letter-spacing:.26em}
-.brand small{display:block;font-size:8px;letter-spacing:.2em;color:#d7cec4;margin-top:4px}
+.brand strong{font-size:19px;font-weight:800;letter-spacing:.17em}
+.brand small{display:block;font-size:8px;letter-spacing:.13em;color:#d9e1e6;margin-top:4px}
 .navlinks{display:flex;gap:28px;font-size:13px}
 .navlinks a{opacity:.86;transition:.2s}
 .navlinks a:hover{opacity:1;color:var(--gold2)}
@@ -107,7 +126,7 @@ button,input,select{font:inherit}
   transform:translateY(calc(var(--p) * -22px));
 }
 .eyebrow{
-  font-size:11px;letter-spacing:.26em;text-transform:uppercase;font-weight:700;color:var(--gold2)
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;font-weight:800;color:#8fe1c4
 }
 h1{
   font-size:clamp(58px,7vw,108px);
@@ -116,7 +135,7 @@ h1{
 }
 .hero-title-line{display:block;color:inherit}
 .hero-title-second{margin-top:.10em}
-.hero-title-accent{color:var(--gold2)}
+.hero-title-accent{color:#8fe1c4}
 .lede{font-size:18px;line-height:1.55;max-width:620px;color:#efe7dd}
 .actions{display:flex;gap:13px;flex-wrap:wrap;margin-top:31px}
 .btn{
@@ -124,7 +143,7 @@ h1{
   border-radius:999px;padding:15px 24px;font-weight:650;font-size:14px;
   transition:.25s ease;
 }
-.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#17120a}
+.btn.gold{background:linear-gradient(135deg,#12b783,var(--brand-green));color:#fff;box-shadow:0 10px 30px rgba(0,166,118,.20)}
 .btn.ghost{border:1px solid rgba(255,255,255,.55)}
 .btn:hover{transform:translateY(-2px)}
 .side-index{justify-self:end;width:235px;align-self:end;margin-bottom:55px}
@@ -229,8 +248,8 @@ h1{
 .estimator-card{padding:34px}
 .estimator-intro{padding-bottom:26px;border-bottom:1px solid rgba(255,255,255,.12)}
 .estimator-kicker{
-  display:inline-flex;padding:7px 11px;border-radius:999px;background:rgba(232,183,91,.11);
-  border:1px solid rgba(232,183,91,.24);color:var(--gold2);font-size:10px;letter-spacing:.16em;text-transform:uppercase
+  display:inline-flex;padding:7px 11px;border-radius:999px;background:rgba(0,166,118,.10);
+  border:1px solid rgba(0,166,118,.28);color:#8fe1c4;font-size:10px;letter-spacing:.16em;text-transform:uppercase
 }
 .estimator-intro h3,.result-empty h3,.needs-study h3,.real-data-copy h3{
   font-size:clamp(28px,3vw,42px);line-height:1.02;letter-spacing:-.04em;font-weight:460;margin:16px 0 10px
