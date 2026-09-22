@@ -20,6 +20,25 @@ function updateStory(){
 addEventListener('scroll',updateStory,{passive:true});
 addEventListener('resize',updateStory);
 updateStory();
+// Keep the Servicios anchor slightly above the reveal panel so navigation never overshoots into the next section.
+document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
+  link.addEventListener('click',event=>{
+    const services=document.getElementById('servicios');
+    if(!services) return;
+
+    event.preventDefault();
+
+    const navHeight=nav ? nav.offsetHeight : (window.innerWidth<=760 ? 72 : 88);
+    const leadIn=Math.min(220,window.innerHeight*.22);
+    const storyTop=story.getBoundingClientRect().top+window.scrollY;
+    const servicesLayoutTop=storyTop+services.offsetTop;
+    const targetY=Math.max(0,servicesLayoutTop-navHeight-leadIn);
+
+    history.replaceState(null,'','#servicios');
+    window.scrollTo({top:targetY,behavior:'smooth'});
+  });
+});
+
 
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
