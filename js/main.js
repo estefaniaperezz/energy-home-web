@@ -382,12 +382,31 @@ async function geocodeLocation(query){
     return parsed;
   }
 
-  const response=await fetch(API_BASE+'/geocode?q='+encodeURIComponent(clean));
+  let response;
+  try{
+    response=await fetch(API_BASE+'/geocode?q='+encodeURIComponent(clean));
+  }catch(error){
+    throw estimatorValidationError(
+      'No hemos podido conectar con el servicio de ubicación. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.',
+      null
+    );
+  }
   if(!response.ok){
     const detail=await response.json().catch(()=>({}));
-    throw estimatorValidationError(detail.error||'No hemos podido comprobar la ubicación.',solarLocation);
+    throw estimatorValidationError(
+      detail.error||'No hemos podido comprobar la ubicación ahora mismo. Revisa la localidad o inténtalo de nuevo en unos segundos.',
+      response.status===404 ? solarLocation : null
+    );
   }
-  const result=await response.json();
+  let result;
+  try{
+    result=await response.json();
+  }catch(error){
+    throw estimatorValidationError(
+      'El servicio de ubicación ha respondido de forma inesperada. Tus datos siguen aquí; vuelve a intentarlo en unos segundos.',
+      null
+    );
+  }
   geocodeCache.set(key,result);
   sessionStorage.setItem('ekinova-geocode-'+key,JSON.stringify(result));
   return result;
@@ -427,19 +446,29 @@ function pvgisLocalParts(time,timezone){
 }
 
 async function fetchPvgisSeries(lat,lon,aspect,timezone,angle=ESTIMATOR_ASSUMPTIONS.referenceTilt){
-  const response=await fetch(
-    API_BASE+'/pvgis?lat='+encodeURIComponent(lat)+
-    '&lon='+encodeURIComponent(lon)+
-    '&aspect='+encodeURIComponent(aspect)+
-    '&angle='+encodeURIComponent(angle)
-  );
+  let response;
+  try{
+    response=await fetch(
+      API_BASE+'/pvgis?lat='+encodeURIComponent(lat)+
+      '&lon='+encodeURIComponent(lon)+
+      '&aspect='+encodeURIComponent(aspect)+
+      '&angle='+encodeURIComponent(angle)
+    );
+  }catch(error){
+    throw new Error('No hemos podido conectar con el servicio de cálculo solar. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.');
+  }
 
   if(!response.ok){
     const detail=await response.json().catch(()=>({}));
-    throw new Error(detail.error||'PVGIS no ha podido devolver datos para esta ubicación.');
+    throw new Error(detail.error||'El servicio de cálculo solar no está disponible ahora mismo. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.');
   }
 
-  const data=await response.json();
+  let data;
+  try{
+    data=await response.json();
+  }catch(error){
+    throw new Error('El servicio de cálculo solar ha respondido de forma inesperada. Tus datos siguen aquí; vuelve a intentarlo en unos segundos.');
+  }
   const hourly=data&&data.outputs&&data.outputs.hourly;
   if(!Array.isArray(hourly)||!hourly.length){
     throw new Error('PVGIS no ha devuelto una serie horaria válida.');
@@ -931,9 +960,10 @@ async function runSolarEstimate(options={}){
     if(runId!==estimateRunId) return;
     console.error(error);
     resetResultState();
-    const message=error && error.message
-      ? error.message
-      : 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.';
+    const rawMessage=error && error.message ? error.message : '';
+    const message=/failed to fetch|networkerror|load failed|network request failed/i.test(rawMessage)
+      ? 'No hemos podido conectar con el servicio de cálculo. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.'
+      : (rawMessage || 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.');
     showEstimatorError(message,error.field||null,activeStatus);
   }finally{
     if(runId===estimateRunId) setEstimatorBusy(false);
