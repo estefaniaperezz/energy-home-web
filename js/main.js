@@ -365,9 +365,9 @@ function getQuickConsumption(){
   };
 }
 
-const API_BASE=(location.hostname==='localhost'||location.hostname==='127.0.0.1')
-  ? 'http://localhost:3000/api'
-  : '/api';
+const IS_LOCAL_PREVIEW=location.hostname==='localhost'||location.hostname==='127.0.0.1';
+const IS_GITHUB_PAGES=location.hostname.endsWith('.github.io');
+const API_BASE=IS_LOCAL_PREVIEW ? 'http://localhost:3000/api' : '/api';
 
 async function geocodeLocation(query){
   const clean=query.trim();
@@ -387,7 +387,7 @@ async function geocodeLocation(query){
     response=await fetch(API_BASE+'/geocode?q='+encodeURIComponent(clean));
   }catch(error){
     throw estimatorValidationError(
-      'No hemos podido conectar con el servicio de ubicación. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.',
+      'No hemos podido conectar con el servicio de ubicación. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.',
       null
     );
   }
@@ -403,7 +403,7 @@ async function geocodeLocation(query){
     result=await response.json();
   }catch(error){
     throw estimatorValidationError(
-      'El servicio de ubicación ha respondido de forma inesperada. Tus datos siguen aquí; vuelve a intentarlo en unos segundos.',
+      'El servicio de ubicación ha respondido de forma inesperada. Los datos que has escrito siguen en el formulario; vuelve a intentarlo en unos segundos.',
       null
     );
   }
@@ -455,19 +455,19 @@ async function fetchPvgisSeries(lat,lon,aspect,timezone,angle=ESTIMATOR_ASSUMPTI
       '&angle='+encodeURIComponent(angle)
     );
   }catch(error){
-    throw new Error('No hemos podido conectar con el servicio de cálculo solar. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.');
+    throw new Error('No hemos podido conectar con el servicio de cálculo solar. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.');
   }
 
   if(!response.ok){
     const detail=await response.json().catch(()=>({}));
-    throw new Error(detail.error||'El servicio de cálculo solar no está disponible ahora mismo. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.');
+    throw new Error(detail.error||'El servicio de cálculo solar no está disponible ahora mismo. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.');
   }
 
   let data;
   try{
     data=await response.json();
   }catch(error){
-    throw new Error('El servicio de cálculo solar ha respondido de forma inesperada. Tus datos siguen aquí; vuelve a intentarlo en unos segundos.');
+    throw new Error('El servicio de cálculo solar ha respondido de forma inesperada. Los datos que has escrito siguen en el formulario; vuelve a intentarlo en unos segundos.');
   }
   const hourly=data&&data.outputs&&data.outputs.hourly;
   if(!Array.isArray(hourly)||!hourly.length){
@@ -876,6 +876,15 @@ async function runSolarEstimate(options={}){
     return;
   }
 
+  if(IS_GITHUB_PAGES){
+    showEstimatorError(
+      'Esta vista previa no puede conectarse al servidor de cálculo solar. Para probar la calculadora completa, abre la web desde el servidor local.',
+      null,
+      activeStatus
+    );
+    return;
+  }
+
   setEstimatorBusy(true);
   if(activeStatus) activeStatus.textContent='Consultando ubicación y datos solares históricos…';
 
@@ -962,7 +971,7 @@ async function runSolarEstimate(options={}){
     resetResultState();
     const rawMessage=error && error.message ? error.message : '';
     const message=/failed to fetch|networkerror|load failed|network request failed/i.test(rawMessage)
-      ? 'No hemos podido conectar con el servicio de cálculo. Tus datos siguen guardados; inténtalo de nuevo en unos segundos.'
+      ? 'No hemos podido conectar con el servicio de cálculo. Los datos que has escrito siguen en el formulario; inténtalo de nuevo en unos segundos.'
       : (rawMessage || 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.');
     showEstimatorError(message,error.field||null,activeStatus);
   }finally{
