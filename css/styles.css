@@ -36,7 +36,7 @@ button,input,select{font:inherit}
 
 /* NAV */
 .nav{
-  position:fixed;z-index:70;left:0;right:0;top:0;height:78px;
+  position:fixed;z-index:70;left:0;right:0;top:0;height:88px;
   display:flex;align-items:center;
   transition:.35s ease;
 }
@@ -50,11 +50,15 @@ button,input,select{font:inherit}
   display:flex;
   align-items:center;
   flex:0 0 auto;
+  padding:7px 12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
 }
 .brand-logo{
   display:block;
   width:auto;
-  height:58px;
+  height:68px;
   object-fit:contain;
 }
 .navlinks{display:flex;gap:28px;font-size:13px}
@@ -74,8 +78,8 @@ button,input,select{font:inherit}
 }
 .sticky{
   position:sticky;
-  top:78px;
-  height:calc(100vh - 78px);
+  top:88px;
+  height:calc(100vh - 88px);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -700,10 +704,10 @@ h1{
   .shell{width:min(100% - 28px,1240px)}
 
   /* Navigation: keep brand + one useful action visible */
-  .nav{height:66px;background:rgba(11,10,9,.76);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
+  .nav{height:72px;background:rgba(11,10,9,.76);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
   .nav-in{gap:10px}
-  .brand{min-width:0}
-  .brand-logo{height:42px;max-width:190px}
+  .brand{min-width:0;padding:5px 8px;border-radius:12px}
+  .brand-logo{height:50px;max-width:220px}
   .brand small{display:none}
   .navlinks{display:none}
   .nav-cta{
@@ -924,14 +928,14 @@ h1{
   .story{
     height:180vh;
     min-height:1300px;
-    padding-top:66px;
+    padding-top:72px;
     position:relative;
   }
 
   .sticky{
     position:sticky;
-    top:66px;
-    height:calc(100vh - 66px);
+    top:72px;
+    height:calc(100vh - 72px);
     display:flex;
     align-items:center;
     justify-content:center;
