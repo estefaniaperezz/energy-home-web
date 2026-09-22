@@ -1,6 +1,7 @@
 const root=document.documentElement;
 const story=document.querySelector('.story');
 const nav=document.getElementById('nav');
+const whatsappFloat=document.querySelector('.whatsapp-float');
 
 function updateStory(){
   const rect=story.getBoundingClientRect();
@@ -11,6 +12,10 @@ function updateStory(){
   const p=active*active*(3-2*active);
   root.style.setProperty('--p',p.toFixed(4));
   nav.classList.toggle('scrolled',window.scrollY>42);
+  if(whatsappFloat){
+    const revealAt=Math.max(280,Math.min(420,window.innerHeight*.38));
+    whatsappFloat.classList.toggle('is-visible',window.scrollY>revealAt);
+  }
 }
 addEventListener('scroll',updateStory,{passive:true});
 addEventListener('resize',updateStory);
