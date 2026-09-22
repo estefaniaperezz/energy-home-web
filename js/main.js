@@ -2,6 +2,35 @@ const root=document.documentElement;
 const story=document.querySelector('.story');
 const nav=document.getElementById('nav');
 const whatsappFloat=document.querySelector('.whatsapp-float');
+const mobileMenuToggle=document.querySelector('.mobile-menu-toggle');
+const mobileMenu=document.getElementById('mobileMenu');
+
+function closeMobileMenu(){
+  if(!mobileMenuToggle || !mobileMenu) return;
+  mobileMenuToggle.setAttribute('aria-expanded','false');
+  mobileMenuToggle.setAttribute('aria-label','Abrir menú');
+  mobileMenu.classList.remove('is-open');
+}
+
+if(mobileMenuToggle && mobileMenu){
+  mobileMenuToggle.addEventListener('click',()=>{
+    const willOpen=mobileMenuToggle.getAttribute('aria-expanded')!=='true';
+    mobileMenuToggle.setAttribute('aria-expanded',String(willOpen));
+    mobileMenuToggle.setAttribute('aria-label',willOpen?'Cerrar menú':'Abrir menú');
+    mobileMenu.classList.toggle('is-open',willOpen);
+  });
+
+  mobileMenu.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMobileMenu));
+
+  document.addEventListener('click',event=>{
+    if(!mobileMenu.classList.contains('is-open')) return;
+    if(!mobileMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) closeMobileMenu();
+  });
+
+  addEventListener('resize',()=>{
+    if(window.innerWidth>980) closeMobileMenu();
+  });
+}
 
 function updateStory(){
   const rect=story.getBoundingClientRect();
@@ -38,6 +67,7 @@ function animatePageScroll(targetY,duration){
 
 document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
   link.addEventListener('click',event=>{
+    closeMobileMenu();
     const services=document.getElementById('servicios');
     if(!services || !story) return;
 
