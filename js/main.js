@@ -35,7 +35,7 @@ document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
     // updateStory() reaches its fully revealed state when raw progress is about .85.
     // Land a touch beyond that so the services panel is fully open but the next section
     // has not started entering the viewport.
-    const revealProgress=window.innerWidth<=760 ? .88 : .87;
+    const revealProgress=window.innerWidth<=760 ? .83 : .91;
     const targetY=Math.max(0,storyTop+(storyTravel*revealProgress));
 
     history.replaceState(null,'','#servicios');
