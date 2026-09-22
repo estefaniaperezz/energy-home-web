@@ -3,7 +3,7 @@
   --brand-blue-hover:var(--brand-blue-hover);
   --brand-blue-deep:#0B2239;
   --brand-green:#088B49;
-  --brand-green-light:#79CBA2;
+  --brand-green-light:#088B49;
   --brand-dark:#1C1C1C;
   --brand-gray:#7D868C;
   --brand-white:#FFFFFF;
@@ -121,7 +121,7 @@ button{
   content:"";position:absolute;inset:0;
   background:
     radial-gradient(circle at 67% 25%,rgba(8,139,73,.28),transparent 23%),
-    linear-gradient(110deg,transparent 0 65%,rgba(121,216,181,.08) 74%,transparent 84%);
+    linear-gradient(110deg,transparent 0 65%,rgba(8,139,73,.08) 74%,transparent 84%);
   pointer-events:none;
 }
 .hero-content{
@@ -369,7 +369,7 @@ h1{
   content:"";position:absolute;border:1px solid rgba(8,139,73,.16);border-radius:50%
 }
 .result-orbit:before{inset:12px}.result-orbit:after{inset:28px}
-.result-orbit span{position:absolute;width:10px;height:10px;background:var(--brand-green-light);border-radius:50%;top:16px;right:17px;box-shadow:0 0 24px rgba(121,216,181,.65)}
+.result-orbit span{position:absolute;width:10px;height:10px;background:var(--brand-green-light);border-radius:50%;top:16px;right:17px;box-shadow:0 0 24px rgba(8,139,73,.65)}
 .result-empty-points{display:grid;gap:10px;margin-top:28px}
 .result-empty-points span{
   position:relative;padding:10px 0 10px 22px;border-top:1px solid rgba(255,255,255,.09);
@@ -566,7 +566,7 @@ h1{
 }
 .whatsapp-float:hover,
 .whatsapp-float:focus-visible{
-  background:#076F3B;
+  background:#088B49;
   box-shadow:0 16px 38px rgba(11,34,57,.28);
 }
 .whatsapp-float:hover span,
