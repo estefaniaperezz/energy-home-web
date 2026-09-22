@@ -423,10 +423,22 @@ h1{
 }
 .form textarea{grid-column:1/-1;min-height:120px}
 .contact-image{
-  min-height:600px;background:
+  --contact-image-y:0px;
+  min-height:600px;
+  position:relative;
+  overflow:hidden;
+  background:#17130f;
+}
+.contact-image::before{
+  content:"";
+  position:absolute;
+  inset:-5% -4%;
+  background:
     linear-gradient(0deg,rgba(8,7,6,.15),rgba(8,7,6,.02)),
     url("../assets/images/vista-aerea-ekinova.png") center/cover;
-  position:relative;
+  transform:translate3d(0,var(--contact-image-y),0) scale(1.02);
+  will-change:transform;
+  pointer-events:none;
 }
 .footer{background:#0c0b0a;color:#9c938a;padding:28px 0;font-size:12px}
 
@@ -1136,9 +1148,7 @@ h1{
   .contact-image{
     min-width:0;
     min-height:650px;
-    background-position:center 50%;
-    background-size:cover;
-    will-change:background-position;
+    will-change:auto;
   }
 }
 
@@ -1149,7 +1159,7 @@ h1{
       opacity:1!important;
     }
     .contact-image{
-      background-position:center 50%!important;
+      --contact-image-y:0px!important;
     }
   }
 }
