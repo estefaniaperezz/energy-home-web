@@ -217,8 +217,7 @@ const geocodeCache=new Map();
 
 document.querySelectorAll('[data-consumption-mode]').forEach(button=>{
   button.addEventListener('click',()=>{
-    invalidatePendingEstimate();
-    clearEstimatorError();
+    handleEstimatorEdit();
     consumptionMode=button.dataset.consumptionMode;
     document.querySelectorAll('[data-consumption-mode]').forEach(b=>b.classList.toggle('active',b===button));
     kwhMode.hidden=consumptionMode!=='kwh';
@@ -284,25 +283,25 @@ function showEstimatorError(message,field=null,statusTarget=null){
   }
 }
 
+function handleEstimatorEdit(){
+  invalidatePendingEstimate();
+  clearEstimatorError();
+
+  // Any visible result belongs to the previous input state.
+  // Remove it immediately so the user never sees stale figures after editing.
+  if((resultData && !resultData.hidden) || (needsStudy && !needsStudy.hidden)){
+    resetResultState();
+  }
+  lastEstimateContext=null;
+}
+
 if(estimatorForm){
-  estimatorForm.addEventListener('input',()=>{
-    invalidatePendingEstimate();
-    clearEstimatorError();
-  });
-  estimatorForm.addEventListener('change',()=>{
-    invalidatePendingEstimate();
-    clearEstimatorError();
-  });
+  estimatorForm.addEventListener('input',handleEstimatorEdit);
+  estimatorForm.addEventListener('change',handleEstimatorEdit);
 }
 if(realDataForm){
-  realDataForm.addEventListener('input',()=>{
-    invalidatePendingEstimate();
-    clearEstimatorError();
-  });
-  realDataForm.addEventListener('change',()=>{
-    invalidatePendingEstimate();
-    clearEstimatorError();
-  });
+  realDataForm.addEventListener('input',handleEstimatorEdit);
+  realDataForm.addEventListener('change',handleEstimatorEdit);
 }
 
 function clamp(value,min,max){
@@ -627,6 +626,12 @@ function bringResultIntoView(){
 }
 
 function showStudyNeeded(title,text,allowRealData=false){
+  [estimatorStatus,realDataStatus].forEach(status=>{
+    if(status){
+      status.textContent='';
+      status.dataset.state='';
+    }
+  });
   resultEmpty.hidden=true;
   resultData.hidden=true;
   needsStudy.hidden=false;
@@ -925,7 +930,6 @@ async function runSolarEstimate(options={}){
     const theoreticalPower=(midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp;
 
     if(theoreticalPower<.5){
-      estimatorStatus.textContent='';
       showStudyNeeded(
         'Este consumo necesita una revisión personalizada.',
         'La potencia preliminar queda por debajo del rango en el que esta calculadora residencial es útil. Preferimos revisarlo contigo antes que mostrar una cifra poco representativa.'
@@ -934,7 +938,6 @@ async function runSolarEstimate(options={}){
     }
 
     if(theoreticalPower>15){
-      estimatorStatus.textContent='';
       showStudyNeeded(
         'Este proyecto necesita un estudio a medida.',
         'La potencia preliminar supera 15 kWp. Para consumos de este tamaño preferimos estudiar la instalación directamente en lugar de mostrar una cifra residencial simplificada.'
@@ -1012,7 +1015,10 @@ function setRealDataPanel(open){
     }else if(annualKwhInput&&annualKwhInput.value){
       suggested=annualKwhInput.value;
     }
-    document.getElementById('realAnnualKwh').value=suggested;
+    const realAnnualInput=document.getElementById('realAnnualKwh');
+    if(realAnnualInput && !realAnnualInput.value.trim()){
+      realAnnualInput.value=suggested;
+    }
 
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
