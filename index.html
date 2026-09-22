@@ -181,7 +181,7 @@
 
               <div class="consumption-mode" id="kwhMode">
                 <div class="input-with-unit">
-                  <input id="annualKwh" type="number" min="500" max="30000" step="100" placeholder="Ej. 4200">
+                  <input id="annualKwh" type="number" min="500" max="30000" step="1" placeholder="Ej. 4200">
                   <span>kWh / año</span>
                 </div>
               </div>
@@ -385,6 +385,7 @@
             </div>
 
             <button class="btn gold real-submit" type="submit">Recalcular mi estimación →</button>
+            <p class="estimator-status" id="realDataStatus" role="status" aria-live="polite"></p>
           </form>
 
           <p class="real-data-note">El resultado sigue siendo una estimación energética, no una oferta ni una factura futura garantizada. Si dejas precios o datos de cubierta vacíos, conservamos supuestos visibles y un rango más prudente.</p>
@@ -485,6 +486,6 @@
   </div>
 </footer>
 
-<script src="js/main.js?v=20260922-12"></script>
+<script src="js/main.js?v=20260922-13"></script>
 </body>
 </html>
