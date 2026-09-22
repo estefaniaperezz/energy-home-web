@@ -46,27 +46,16 @@ button,input,select{font:inherit}
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:28px}
-.brand{display:flex;align-items:center}
-.brand-wordmark{display:grid;grid-template-columns:auto auto;column-gap:8px;align-items:baseline;line-height:1}
-.brand-wordmark strong{
-  font-size:19px;
-  font-weight:800;
-  letter-spacing:.13em;
-  color:#fff;
+.brand{
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
 }
-.brand-wordmark b{
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:.22em;
-  color:var(--brand-green);
-}
-.brand-wordmark small{
-  grid-column:1/-1;
+.brand-logo{
   display:block;
-  margin-top:5px;
-  font-size:7px;
-  letter-spacing:.11em;
-  color:#d9e1e6;
+  width:auto;
+  height:58px;
+  object-fit:contain;
 }
 .navlinks{display:flex;gap:28px;font-size:13px}
 .navlinks a{opacity:.86;transition:.2s}
@@ -713,10 +702,8 @@ h1{
   /* Navigation: keep brand + one useful action visible */
   .nav{height:66px;background:rgba(11,10,9,.76);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
   .nav-in{gap:10px}
-  .brand{gap:9px;min-width:0}
-  .brand-wordmark strong{font-size:14px;letter-spacing:.12em;white-space:nowrap}
-  .brand-wordmark b{font-size:11px;letter-spacing:.18em}
-  .brand-wordmark small{display:none}
+  .brand{min-width:0}
+  .brand-logo{height:42px;max-width:190px}
   .brand small{display:none}
   .navlinks{display:none}
   .nav-cta{
