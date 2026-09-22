@@ -179,3 +179,16 @@ La calculadora no se considera cerrada hasta que:
 - los resultados previos no contaminan intentos posteriores;
 - desktop y móvil funcionan;
 - se repite una regresión final completa después del último fix.
+
+
+## Evidencia manual con servicios reales — 22/09/2026
+Pruebas ejecutadas desde el entorno local con `node server.js`, conectando con Nominatim y PVGIS reales:
+
+- `05001 / 4200 kWh / Sur / Repartido / Sin sombras` — PASA.
+- `28001 / 6500 kWh / Este-Oeste / Día / Sin sombras` — PASA.
+- `38001 / 3500 kWh / Sur / Tarde-noche / Sin sombras` — PASA; se valida además el flujo de zona Canarias.
+- `05001 / 500 kWh / Sur / Repartido / Sin sombras` — PASA; el límite bajo se resuelve sin error técnico.
+- `05001 / 30000 kWh / Sur / Repartido / Sin sombras` — PASA; el límite alto se resuelve sin romper el flujo.
+- En los casos anteriores se comprobó también el recálculo tras modificar datos sin necesidad de recargar la página.
+
+Esta evidencia complementa la auditoría automatizada con respuestas simuladas. Sigue pendiente el cierre de la Sección 11, el barrido de overflow y la regresión final completa después de los últimos fixes.
