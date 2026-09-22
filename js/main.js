@@ -184,6 +184,7 @@ const realDataToggle=document.getElementById('realDataToggle');
 const realDataPanel=document.getElementById('realDataPanel');
 const realDataForm=document.getElementById('realDataForm');
 const realDataStatus=document.getElementById('realDataStatus');
+const realEstimateButton=realDataForm?.querySelector('.real-submit');
 const advancedDataToggle=document.getElementById('advancedDataToggle');
 const advancedDataFields=document.getElementById('advancedDataFields');
 const useMonthlyData=document.getElementById('useMonthlyData');
@@ -210,11 +211,13 @@ const CONSUMPTION_PROFILES={
 
 let consumptionMode='kwh';
 let lastEstimateContext=null;
+let estimateRunId=0;
 const solarCache=new Map();
 const geocodeCache=new Map();
 
 document.querySelectorAll('[data-consumption-mode]').forEach(button=>{
   button.addEventListener('click',()=>{
+    invalidatePendingEstimate();
     clearEstimatorError();
     consumptionMode=button.dataset.consumptionMode;
     document.querySelectorAll('[data-consumption-mode]').forEach(b=>b.classList.toggle('active',b===button));
@@ -240,6 +243,16 @@ function estimatorValidationError(message,field=null){
   return error;
 }
 
+function setEstimatorBusy(busy){
+  if(estimateButton) estimateButton.disabled=busy;
+  if(realEstimateButton) realEstimateButton.disabled=busy;
+}
+
+function invalidatePendingEstimate(){
+  estimateRunId+=1;
+  setEstimatorBusy(false);
+}
+
 function clearEstimatorError(){
   [estimatorStatus,realDataStatus].forEach(status=>{
     if(status && status.dataset.state==='error'){
@@ -257,7 +270,7 @@ function showEstimatorError(message,field=null,statusTarget=null){
   if(!status) return;
   status.textContent=message;
   status.dataset.state='error';
-  estimateButton.disabled=false;
+  setEstimatorBusy(false);
 
   if(field){
     field.setAttribute('aria-invalid','true');
@@ -272,12 +285,24 @@ function showEstimatorError(message,field=null,statusTarget=null){
 }
 
 if(estimatorForm){
-  estimatorForm.addEventListener('input',clearEstimatorError);
-  estimatorForm.addEventListener('change',clearEstimatorError);
+  estimatorForm.addEventListener('input',()=>{
+    invalidatePendingEstimate();
+    clearEstimatorError();
+  });
+  estimatorForm.addEventListener('change',()=>{
+    invalidatePendingEstimate();
+    clearEstimatorError();
+  });
 }
 if(realDataForm){
-  realDataForm.addEventListener('input',clearEstimatorError);
-  realDataForm.addEventListener('change',clearEstimatorError);
+  realDataForm.addEventListener('input',()=>{
+    invalidatePendingEstimate();
+    clearEstimatorError();
+  });
+  realDataForm.addEventListener('change',()=>{
+    invalidatePendingEstimate();
+    clearEstimatorError();
+  });
 }
 
 function clamp(value,min,max){
@@ -712,6 +737,8 @@ async function runSolarEstimate(options={}){
   if(!estimatorForm) return;
 
   const advanced=Boolean(options.advanced);
+  const runId=++estimateRunId;
+  const activeStatus=advanced?realDataStatus:estimatorStatus;
   clearEstimatorError();
   resetResultState();
   const orientation=selectedValue('orientation');
@@ -792,6 +819,12 @@ async function runSolarEstimate(options={}){
       prices={buy:custom.buy,exported:custom.exported};
       exactPrices=custom.exact;
       roofData=advancedRoofData(orientation);
+      if(roofData.orientation==='unknown'){
+        throw estimatorValidationError(
+          'Selecciona una orientación aproximada de la cubierta para poder recalcular.',
+          document.getElementById('preciseOrientation')
+        );
+      }
     }else{
       consumption=getQuickConsumption();
     }
@@ -814,12 +847,13 @@ async function runSolarEstimate(options={}){
     return;
   }
 
-  estimateButton.disabled=true;
-  estimatorStatus.textContent='Consultando ubicación y datos solares históricos…';
+  setEstimatorBusy(true);
+  if(activeStatus) activeStatus.textContent='Consultando ubicación y datos solares históricos…';
 
   try{
     const location=await geocodeLocation(locationQuery);
-    estimatorStatus.textContent='Calculando producción y cruce horario con tu consumo…';
+    if(runId!==estimateRunId) return;
+    if(activeStatus) activeStatus.textContent='Calculando producción y cruce horario con tu consumo…';
     const simulationOrientation=advanced?roofData.orientation:orientation;
     const simulationAngle=advanced?roofData.angle:ESTIMATOR_ASSUMPTIONS.referenceTilt;
     if(simulationOrientation==='unknown'){
@@ -833,6 +867,7 @@ async function runSolarEstimate(options={}){
       location.timezone||'Europe/Madrid',
       simulationAngle
     );
+    if(runId!==estimateRunId) return;
 
     const yieldPerKwp=annualYieldPerKwp(series);
     const midConsumption=(consumption.min+consumption.max)/2;
@@ -888,16 +923,20 @@ async function runSolarEstimate(options={}){
       advanced
     });
 
-    estimatorStatus.textContent='Estimación calculada. Te mostramos un rango para no fingir una precisión que no tenemos.';
+    if(activeStatus){
+      activeStatus.textContent='Estimación calculada. Te mostramos un rango para no fingir una precisión que no tenemos.';
+      activeStatus.dataset.state='';
+    }
   }catch(error){
+    if(runId!==estimateRunId) return;
     console.error(error);
     resetResultState();
     const message=error && error.message
       ? error.message
       : 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.';
-    showEstimatorError(message,error.field||null,advanced?realDataStatus:estimatorStatus);
+    showEstimatorError(message,error.field||null,activeStatus);
   }finally{
-    estimateButton.disabled=false;
+    if(runId===estimateRunId) setEstimatorBusy(false);
   }
 }
 
