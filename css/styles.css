@@ -205,7 +205,7 @@ h1{
 
 /* NORMAL CONTINUATION */
 .after-story{
-  background:#F4F7F6;
+  background:#FFFFFF;
   color:var(--ink);
   position:relative;
   z-index:10;
