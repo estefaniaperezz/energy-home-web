@@ -179,6 +179,7 @@ const estimateResult=document.getElementById('estimateResult');
 const resultEmpty=document.getElementById('resultEmpty');
 const resultData=document.getElementById('resultData');
 const needsStudy=document.getElementById('needsStudy');
+const needsStudyRealData=document.getElementById('needsStudyRealData');
 const realDataToggle=document.getElementById('realDataToggle');
 const realDataPanel=document.getElementById('realDataPanel');
 const realDataForm=document.getElementById('realDataForm');
@@ -230,6 +231,12 @@ if(quickBill){
 function selectedValue(name){
   const el=document.querySelector('input[name="'+name+'"]:checked');
   return el?el.value:null;
+}
+
+function estimatorValidationError(message,field=null){
+  const error=new Error(message);
+  error.field=field;
+  return error;
 }
 
 function clearEstimatorError(){
@@ -307,7 +314,8 @@ function daysInYear(year){
 function getQuickConsumption(){
   if(consumptionMode==='kwh'){
     const value=Number(annualKwhInput.value);
-    if(!Number.isFinite(value)||value<500) throw new Error('Introduce tu consumo anual en kWh.');
+    if(!Number.isFinite(value)||value<500) throw estimatorValidationError('Introduce un consumo anual de al menos 500 kWh.',annualKwhInput);
+    if(value>30000) throw estimatorValidationError('Para consumos superiores a 30.000 kWh preferimos hacer un estudio personalizado.',annualKwhInput);
     return {min:value,max:value,basis:'kwh'};
   }
 
@@ -329,7 +337,7 @@ const API_BASE=(location.hostname==='localhost'||location.hostname==='127.0.0.1'
 
 async function geocodeLocation(query){
   const clean=query.trim();
-  if(!clean) throw new Error('Introduce el código postal o la localidad.');
+  if(!clean) throw estimatorValidationError('Introduce el código postal o la localidad.',solarLocation);
   const key=clean.toLowerCase();
   if(geocodeCache.has(key)) return geocodeCache.get(key);
 
@@ -343,7 +351,7 @@ async function geocodeLocation(query){
   const response=await fetch(API_BASE+'/geocode?q='+encodeURIComponent(clean));
   if(!response.ok){
     const detail=await response.json().catch(()=>({}));
-    throw new Error(detail.error||'No hemos podido comprobar la ubicación.');
+    throw estimatorValidationError(detail.error||'No hemos podido comprobar la ubicación.',solarLocation);
   }
   const result=await response.json();
   geocodeCache.set(key,result);
@@ -548,12 +556,13 @@ function bringResultIntoView(){
   });
 }
 
-function showStudyNeeded(title,text){
+function showStudyNeeded(title,text,allowRealData=false){
   resultEmpty.hidden=true;
   resultData.hidden=true;
   needsStudy.hidden=false;
   document.getElementById('needsStudyTitle').textContent=title;
   document.getElementById('needsStudyText').textContent=text;
+  if(needsStudyRealData) needsStudyRealData.hidden=!allowRealData;
   realDataPanel.hidden=true;
   bringResultIntoView();
 }
@@ -640,11 +649,11 @@ function advancedPrices(){
   const exported=exportRaw?parseDecimal(exportRaw):null;
 
   if(buyRaw && (!Number.isFinite(buy) || buy<.03 || buy>1)){
-    throw new Error('Revisa el precio de la energía: debe estar entre 0,03 y 1,00 €/kWh.');
+    throw estimatorValidationError('Revisa el precio de la energía: debe estar entre 0,03 y 1,00 €/kWh.',document.getElementById('realBuyPrice'));
   }
 
   if(exportRaw && (!Number.isFinite(exported) || exported<0 || exported>.5)){
-    throw new Error('Revisa la compensación de excedentes: debe estar entre 0 y 0,50 €/kWh.');
+    throw estimatorValidationError('Revisa la compensación de excedentes: debe estar entre 0 y 0,50 €/kWh.',document.getElementById('realExportPrice'));
   }
 
   return {
@@ -661,15 +670,16 @@ function getMonthlyConsumption(){
   const emptyMonth=inputs.find(input=>input.value.trim()==='');
   if(emptyMonth){
     const monthLabel=emptyMonth.closest('label')?.childNodes[0]?.textContent.trim()||'un mes';
-    throw new Error('Falta el consumo de '+monthLabel+'. Completa los 12 meses o desactiva esa opción.');
+    throw estimatorValidationError('Falta el consumo de '+monthLabel+'. Completa los 12 meses o desactiva esa opción.',emptyMonth);
   }
 
   const values=inputs.map(input=>Number(input.value));
-  if(values.some(value=>!Number.isFinite(value)||value<0||value>10000)){
-    throw new Error('Revisa los consumos mensuales: cada valor debe estar entre 0 y 10.000 kWh.');
+  const invalidIndex=values.findIndex(value=>!Number.isFinite(value)||value<0||value>10000);
+  if(invalidIndex!==-1){
+    throw estimatorValidationError('Revisa los consumos mensuales: cada valor debe estar entre 0 y 10.000 kWh.',inputs[invalidIndex]);
   }
   if(values.every(value=>value===0)){
-    throw new Error('Los consumos mensuales no pueden estar todos a cero.');
+    throw estimatorValidationError('Los consumos mensuales no pueden estar todos a cero.',inputs[0]);
   }
   return values;
 }
@@ -700,7 +710,8 @@ async function runSolarEstimate(options={}){
     estimatorStatus.textContent='';
     showStudyNeeded(
       'Con orientación norte no queremos adivinar.',
-      'El resultado cambia mucho según la inclinación y el tipo de cubierta. Antes de enseñarte una cifra necesitamos confirmar si el tejado es plano, inclinado y cómo podrían colocarse realmente los paneles.'
+      'El resultado cambia mucho según la inclinación y el tipo de cubierta. Antes de enseñarte una cifra necesitamos confirmar si el tejado es plano, inclinado y cómo podrían colocarse realmente los paneles.',
+      true
     );
     return;
   }
@@ -709,7 +720,8 @@ async function runSolarEstimate(options={}){
     estimatorStatus.textContent='';
     showStudyNeeded(
       'Necesitamos conocer la orientación.',
-      'Sin una orientación aproximada el rango sería demasiado amplio para ser útil. Puedes consultarla con una brújula del móvil o pedirnos que la revisemos contigo.'
+      'Sin una orientación aproximada el rango sería demasiado amplio para ser útil. Puedes consultarla con una brújula del móvil o añadir los datos de tu factura y cubierta.',
+      true
     );
     return;
   }
@@ -727,7 +739,8 @@ async function runSolarEstimate(options={}){
     estimatorStatus.textContent='';
     showStudyNeeded(
       'Antes de calcular, necesitamos confirmar las sombras.',
-      'Si no sabemos si hay árboles, edificios o chimeneas que sombreen la cubierta, el mismo número podría parecer más fiable de lo que es. Puedes usar los datos de tu factura para continuar con una estimación marcada como baja confianza.'
+      'Si no sabemos si hay árboles, edificios o chimeneas que sombreen la cubierta, el mismo número podría parecer más fiable de lo que es. Puedes usar los datos de tu factura para continuar con una estimación marcada como baja confianza.',
+      true
     );
     return;
   }
@@ -740,17 +753,20 @@ async function runSolarEstimate(options={}){
 
   try{
     if(advanced){
-      const real=Number(document.getElementById('realAnnualKwh').value);
-      if(!Number.isFinite(real)||real<100) throw new Error('Introduce el consumo anual de tu factura.');
+      const realAnnualInput=document.getElementById('realAnnualKwh');
+      const real=Number(realAnnualInput.value);
+      if(!Number.isFinite(real)||real<100) throw estimatorValidationError('Introduce un consumo anual de al menos 100 kWh.',realAnnualInput);
+      if(real>50000) throw estimatorValidationError('Para consumos superiores a 50.000 kWh necesitamos un estudio personalizado.',realAnnualInput);
       monthlyConsumption=getMonthlyConsumption();
       let realTotal=real;
       if(monthlyConsumption){
         const monthlySum=monthlyConsumption.reduce((a,b)=>a+b,0);
         const difference=Math.abs(monthlySum-real)/Math.max(real,1);
         if(difference>.05){
-          throw new Error(
+          throw estimatorValidationError(
             'Los 12 meses suman '+formatInt(monthlySum)+' kWh, pero tu consumo anual indica '+
-            formatInt(real)+' kWh. Revisa cuál de los dos datos es correcto.'
+            formatInt(real)+' kWh. Revisa cuál de los dos datos es correcto.',
+            realAnnualInput
           );
         }
         realTotal=monthlySum;
@@ -764,8 +780,7 @@ async function runSolarEstimate(options={}){
       consumption=getQuickConsumption();
     }
   }catch(error){
-    const field=advanced ? document.getElementById('realAnnualKwh') : (consumptionMode==='kwh' ? annualKwhInput : null);
-    showEstimatorError(error.message,field);
+    showEstimatorError(error.message,error.field||null);
     return;
   }
 
@@ -808,11 +823,21 @@ async function runSolarEstimate(options={}){
     const theoreticalPower=(midConsumption*ESTIMATOR_ASSUMPTIONS.targetCoverage)/yieldPerKwp;
 
     if(theoreticalPower<.5){
-      throw new Error('Tu consumo es demasiado bajo para que esta estimación rápida dimensione una instalación residencial con sentido. Necesitamos revisarlo de forma personalizada.');
+      estimatorStatus.textContent='';
+      showStudyNeeded(
+        'Este consumo necesita una revisión personalizada.',
+        'La potencia preliminar queda por debajo del rango en el que esta calculadora residencial es útil. Preferimos revisarlo contigo antes que mostrar una cifra poco representativa.'
+      );
+      return;
     }
 
     if(theoreticalPower>15){
-      throw new Error('La potencia preliminar supera 15 kWp. Para consumos de este tamaño preferimos hacer un estudio personalizado en lugar de mostrar una cifra residencial simplificada.');
+      estimatorStatus.textContent='';
+      showStudyNeeded(
+        'Este proyecto necesita un estudio a medida.',
+        'La potencia preliminar supera 15 kWp. Para consumos de este tamaño preferimos estudiar la instalación directamente en lugar de mostrar una cifra residencial simplificada.'
+      );
+      return;
     }
 
     const peakPower=Math.round(theoreticalPower*10)/10;
@@ -854,7 +879,7 @@ async function runSolarEstimate(options={}){
     const message=error && error.message
       ? error.message
       : 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.';
-    showEstimatorError(message,solarLocation);
+    showEstimatorError(message,error.field||null);
   }finally{
     estimateButton.disabled=false;
   }
@@ -867,32 +892,37 @@ if(estimatorForm){
   });
 }
 
-if(realDataToggle){
-  realDataToggle.addEventListener('click',()=>{
-    realDataPanel.hidden=!realDataPanel.hidden;
-    const layout=document.querySelector('.estimator-layout');
-    if(layout) layout.classList.toggle('real-data-open',!realDataPanel.hidden);
+function setRealDataPanel(open){
+  if(!realDataPanel) return;
+  realDataPanel.hidden=!open;
+  const layout=document.querySelector('.estimator-layout');
+  if(layout) layout.classList.toggle('real-data-open',open);
 
-    if(!realDataPanel.hidden){
-      let suggested='';
-      if(lastEstimateContext){
-        suggested=Math.round((lastEstimateContext.consumption.min+lastEstimateContext.consumption.max)/2);
-      }else if(annualKwhInput&&annualKwhInput.value){
-        suggested=annualKwhInput.value;
-      }
-      document.getElementById('realAnnualKwh').value=suggested;
-
-      // Wait for the expanded layout to finish reflowing before scrolling.
-      // This prevents the page from overshooting below the form.
-      requestAnimationFrame(()=>{
-        requestAnimationFrame(()=>{
-          const navOffset=96;
-          const targetY=window.scrollY+realDataPanel.getBoundingClientRect().top-navOffset;
-          window.scrollTo({top:Math.max(0,targetY),behavior:'smooth'});
-        });
-      });
+  if(open){
+    let suggested='';
+    if(lastEstimateContext){
+      suggested=Math.round((lastEstimateContext.consumption.min+lastEstimateContext.consumption.max)/2);
+    }else if(annualKwhInput&&annualKwhInput.value){
+      suggested=annualKwhInput.value;
     }
-  });
+    document.getElementById('realAnnualKwh').value=suggested;
+
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        const navOffset=window.innerWidth<=760?78:96;
+        const targetY=window.scrollY+realDataPanel.getBoundingClientRect().top-navOffset;
+        window.scrollTo({top:Math.max(0,targetY),behavior:'smooth'});
+      });
+    });
+  }
+}
+
+if(realDataToggle){
+  realDataToggle.addEventListener('click',()=>setRealDataPanel(realDataPanel.hidden));
+}
+
+if(needsStudyRealData){
+  needsStudyRealData.addEventListener('click',()=>setRealDataPanel(true));
 }
 
 if(realDataForm){
