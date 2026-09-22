@@ -183,6 +183,7 @@ const needsStudyRealData=document.getElementById('needsStudyRealData');
 const realDataToggle=document.getElementById('realDataToggle');
 const realDataPanel=document.getElementById('realDataPanel');
 const realDataForm=document.getElementById('realDataForm');
+const realDataStatus=document.getElementById('realDataStatus');
 const advancedDataToggle=document.getElementById('advancedDataToggle');
 const advancedDataFields=document.getElementById('advancedDataFields');
 const useMonthlyData=document.getElementById('useMonthlyData');
@@ -240,18 +241,22 @@ function estimatorValidationError(message,field=null){
 }
 
 function clearEstimatorError(){
-  if(!estimatorStatus) return;
-  if(estimatorStatus.dataset.state==='error'){
-    estimatorStatus.textContent='';
-    estimatorStatus.dataset.state='';
-  }
-  estimatorForm?.querySelectorAll('[aria-invalid="true"]').forEach(el=>el.removeAttribute('aria-invalid'));
+  [estimatorStatus,realDataStatus].forEach(status=>{
+    if(status && status.dataset.state==='error'){
+      status.textContent='';
+      status.dataset.state='';
+    }
+  });
+  [estimatorForm,realDataForm].forEach(form=>{
+    form?.querySelectorAll('[aria-invalid="true"]').forEach(el=>el.removeAttribute('aria-invalid'));
+  });
 }
 
-function showEstimatorError(message,field=null){
-  if(!estimatorStatus) return;
-  estimatorStatus.textContent=message;
-  estimatorStatus.dataset.state='error';
+function showEstimatorError(message,field=null,statusTarget=null){
+  const status=statusTarget || (field && realDataForm?.contains(field) ? realDataStatus : estimatorStatus);
+  if(!status) return;
+  status.textContent=message;
+  status.dataset.state='error';
   estimateButton.disabled=false;
 
   if(field){
@@ -269,6 +274,10 @@ function showEstimatorError(message,field=null){
 if(estimatorForm){
   estimatorForm.addEventListener('input',clearEstimatorError);
   estimatorForm.addEventListener('change',clearEstimatorError);
+}
+if(realDataForm){
+  realDataForm.addEventListener('input',clearEstimatorError);
+  realDataForm.addEventListener('change',clearEstimatorError);
 }
 
 function clamp(value,min,max){
@@ -564,6 +573,7 @@ function showStudyNeeded(title,text,allowRealData=false){
   document.getElementById('needsStudyText').textContent=text;
   if(needsStudyRealData) needsStudyRealData.hidden=!allowRealData;
   realDataPanel.hidden=true;
+  document.querySelector('.estimator-layout')?.classList.remove('real-data-open');
   bringResultIntoView();
 }
 
@@ -656,6 +666,10 @@ function advancedPrices(){
     throw estimatorValidationError('Revisa la compensación de excedentes: debe estar entre 0 y 0,50 €/kWh.',document.getElementById('realExportPrice'));
   }
 
+  if(Number.isFinite(buy) && Number.isFinite(exported) && exported>buy){
+    throw estimatorValidationError('La compensación de excedentes no puede ser mayor que el precio de la energía comprada en esta estimación.',document.getElementById('realExportPrice'));
+  }
+
   return {
     buy:Number.isFinite(buy)?[buy,buy]:ESTIMATOR_ASSUMPTIONS.buyPrice,
     exported:Number.isFinite(exported)?[exported,exported]:ESTIMATOR_ASSUMPTIONS.exportPrice,
@@ -698,6 +712,8 @@ async function runSolarEstimate(options={}){
   if(!estimatorForm) return;
 
   const advanced=Boolean(options.advanced);
+  clearEstimatorError();
+  resetResultState();
   const orientation=selectedValue('orientation');
   const profile=selectedValue('profile');
   const shade=selectedValue('shade');
@@ -780,7 +796,7 @@ async function runSolarEstimate(options={}){
       consumption=getQuickConsumption();
     }
   }catch(error){
-    showEstimatorError(error.message,error.field||null);
+    showEstimatorError(error.message,error.field||null,advanced?realDataStatus:estimatorStatus);
     return;
   }
 
@@ -879,7 +895,7 @@ async function runSolarEstimate(options={}){
     const message=error && error.message
       ? error.message
       : 'No podemos obtener ahora mismo los datos necesarios. No vamos a sustituirlos por una cifra inventada.';
-    showEstimatorError(message,error.field||null);
+    showEstimatorError(message,error.field||null,advanced?realDataStatus:estimatorStatus);
   }finally{
     estimateButton.disabled=false;
   }
