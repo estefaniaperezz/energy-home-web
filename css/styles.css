@@ -109,7 +109,7 @@ button,input,select{font:inherit}
     translateY(calc(var(--p) * -18px))
     scale(calc(1 - var(--p) * .055));
   transform-origin:center top;
-  box-shadow:0 50px 120px rgba(0,0,0,.38);
+  box-shadow:0 20px 50px rgba(15,76,129,.08);
   border:1px solid rgba(255,255,255,.10);
   background:
     linear-gradient(90deg,rgba(8,7,6,.78) 0%,rgba(8,7,6,.43) 38%,rgba(8,7,6,.10) 70%),
@@ -722,7 +722,7 @@ h1{
     background:#fff;
     color:var(--brand-dark);
     backdrop-filter:blur(16px);
-    border-bottom:1px solid rgba(15,76,129,.10);
+    border-bottom:0;
   }
   .nav-in{gap:10px}
   .brand{min-width:0;padding:0;border-radius:0}
