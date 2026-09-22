@@ -14,7 +14,7 @@
   --line:rgba(255,255,255,.16);
   --p:0;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
 body{
@@ -304,7 +304,7 @@ h1{
   color:#fff;padding:14px 15px;outline:none
 }
 .question-content>input[type="text"]:focus,.input-with-unit:focus-within{
-  border-color:rgba(8,139,73,.65);box-shadow:0 0 0 3px rgba(8,139,73,.08)
+  border-color:rgba(255,255,255,.62);box-shadow:0 0 0 3px rgba(255,255,255,.07)
 }
 .question-content>input::placeholder,.input-with-unit input::placeholder{color:#87939A}
 .mode-switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
@@ -320,15 +320,15 @@ h1{
   box-shadow:none;
 }
 .mode-btn:hover{
-  border-color:rgba(8,139,73,.55);
-  background:rgba(8,139,73,.06);
+  border-color:rgba(255,255,255,.38);
+  background:rgba(255,255,255,.035);
 }
 .mode-btn.active{
   color:#fff;
-  background:var(--brand-green);
-  border-color:var(--brand-green);
+  background:rgba(255,255,255,.035);
+  border-color:rgba(255,255,255,.72);
   font-weight:700;
-  box-shadow:none;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px rgba(255,255,255,.05);
 }
 .consumption-mode{margin-top:10px}
 .input-with-unit{display:flex;align-items:center;overflow:hidden}
@@ -355,10 +355,14 @@ h1{
 }
 .choice-card b{font-size:12px;color:#E3EAED}
 .choice-card small{font-size:10px;color:#8E9AA1;line-height:1.35}
-.choice-card:hover>span{border-color:rgba(8,139,73,.35);background:rgba(8,139,73,.045)}
+.choice-card:hover>span{
+  border-color:rgba(255,255,255,.34);
+  background:rgba(255,255,255,.025)
+}
 .choice-card input:checked+span{
-  border-color:rgba(8,139,73,.72);background:rgba(8,139,73,.10);
-  box-shadow:inset 0 0 0 1px rgba(8,139,73,.08)
+  border-color:rgba(255,255,255,.72);
+  background:rgba(255,255,255,.025);
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 18px rgba(255,255,255,.05)
 }
 .choice-card input:checked+span b{color:#fff}
 .estimator-submit{width:100%;margin-top:26px;border:0;cursor:pointer}
@@ -424,8 +428,8 @@ h1{
   box-shadow:none;
 }
 .result-detail-btn:hover{
-  border-color:rgba(8,139,73,.60);
-  background:rgba(8,139,73,.07);
+  border-color:rgba(255,255,255,.48);
+  background:transparent;
 }
 .needs-study{padding-top:70px}
 .needs-study .btn{margin-top:24px}
@@ -468,13 +472,14 @@ h1{
   background:var(--brand-blue-deep);transition:.25s;
 }
 .step.active{
-  border-color:var(--brand-green);
+  border-color:rgba(255,255,255,.68);
   background:var(--brand-blue-deep);
-  box-shadow:0 0 0 1px rgba(8,139,73,.22),0 0 24px rgba(8,139,73,.14);
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 22px rgba(255,255,255,.05);
   transform:translateX(-6px)
 }
 .step-top{display:flex;align-items:center;gap:14px}
 .step small{color:var(--brand-green)}
+.step.active small{color:#fff}
 .step h4{margin:0;font-size:18px}
 .step p{display:none;margin:9px 0 0 33px;color:var(--muted);font-size:13px;line-height:1.45}
 .step.active p{display:block}
@@ -603,14 +608,14 @@ h1{
 .footer-in{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .footer-socials{display:flex;align-items:center;gap:9px}
 .social-placeholder{
-  width:34px;height:34px;border-radius:50%;
+  width:48px;height:48px;border-radius:50%;
   display:grid;place-items:center;
-  border:1px solid rgba(255,255,255,.14);
-  color:var(--brand-green-light);
+  border:1px solid rgba(255,255,255,.24);
+  color:#fff;
   background:rgba(255,255,255,.035);
-  opacity:.72;
+  opacity:.96;
 }
-.social-placeholder svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7}
+.social-placeholder svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7}
 .social-placeholder:nth-child(2) svg{fill:currentColor;stroke:none}
 
 /* simple scroll reveal for later sections */
@@ -742,8 +747,8 @@ h1{
   box-shadow:none;
 }
 .advanced-data-toggle:hover{
-  border-color:rgba(8,139,73,.50);
-  background:rgba(8,139,73,.05);
+  border-color:rgba(255,255,255,.42);
+  background:transparent;
 }
 .advanced-data-toggle span{display:block}
 .advanced-data-toggle b{display:block;font-size:12px}
@@ -776,8 +781,8 @@ h1{
   color:#fff;border-radius:10px;padding:11px 8px;min-height:44px;outline:none;
 }
 .monthly-grid input:focus{
-  border-color:rgba(8,139,73,.6);
-  box-shadow:0 0 0 3px rgba(8,139,73,.07);
+  border-color:rgba(255,255,255,.60);
+  box-shadow:0 0 0 3px rgba(255,255,255,.06);
 }
 .monthly-total{
   min-height:16px;
@@ -1247,7 +1252,9 @@ h1{
 
   #proceso .step.active{
     padding:16px;
-    background:rgba(8,139,73,.07);
+    background:var(--brand-blue-deep);
+    border-color:rgba(255,255,255,.68);
+    box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 22px rgba(255,255,255,.05);
   }
 
   #proceso .step.active::before{
@@ -1259,7 +1266,7 @@ h1{
     background:
       linear-gradient(180deg,rgba(8,7,6,.04),rgba(8,7,6,.42)),
       var(--step-image) center/cover no-repeat;
-    border-bottom:1px solid rgba(8,139,73,.18);
+    border-bottom:1px solid rgba(255,255,255,.18);
   }
 
   #proceso .step.active p{
