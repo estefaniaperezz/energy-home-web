@@ -2,8 +2,8 @@
   --brand-blue:#0F4C81;
   --brand-blue-hover:var(--brand-blue-hover);
   --brand-blue-deep:#0B2239;
-  --brand-green:#018A46;
-  --brand-green-light:#72C89D;
+  --brand-green:#088B49;
+  --brand-green-light:#79CBA2;
   --brand-dark:#1C1C1C;
   --brand-gray:#7D868C;
   --brand-white:#FFFFFF;
@@ -120,7 +120,7 @@ button{
 .hero-card:before{
   content:"";position:absolute;inset:0;
   background:
-    radial-gradient(circle at 67% 25%,rgba(1,138,70,.28),transparent 23%),
+    radial-gradient(circle at 67% 25%,rgba(8,139,73,.28),transparent 23%),
     linear-gradient(110deg,transparent 0 65%,rgba(121,216,181,.08) 74%,transparent 84%);
   pointer-events:none;
 }
@@ -155,7 +155,7 @@ h1{
   background:var(--brand-green);
   color:#fff;
   border:0;
-  box-shadow:0 8px 22px rgba(1,138,70,.14);
+  box-shadow:0 8px 22px rgba(8,139,73,.14);
 }
 .btn.ghost{border:1px solid rgba(255,255,255,.55)}
 .btn:hover{transform:translateY(-2px)}
@@ -241,7 +241,7 @@ h1{
 }
 .savings-section{
   background:
-    radial-gradient(circle at 80% 12%,rgba(1,138,70,.14),transparent 30%),
+    radial-gradient(circle at 80% 12%,rgba(8,139,73,.14),transparent 30%),
     radial-gradient(circle at 15% 75%,rgba(15,76,129,.18),transparent 30%),
     linear-gradient(180deg,#0B2239 0%,#0B2239 100%);
   color:#fff;
@@ -264,8 +264,8 @@ h1{
 .estimator-card{padding:34px}
 .estimator-intro{padding-bottom:26px;border-bottom:1px solid rgba(255,255,255,.12)}
 .estimator-kicker{
-  display:inline-flex;padding:7px 11px;border-radius:999px;background:rgba(1,138,70,.10);
-  border:1px solid rgba(1,138,70,.28);color:var(--brand-green-light);font-size:10px;letter-spacing:.16em;text-transform:uppercase
+  display:inline-flex;padding:7px 11px;border-radius:999px;background:rgba(8,139,73,.10);
+  border:1px solid rgba(8,139,73,.28);color:var(--brand-green-light);font-size:10px;letter-spacing:.16em;text-transform:uppercase
 }
 .estimator-intro h3,.result-empty h3,.needs-study h3,.real-data-copy h3{
   font-size:clamp(28px,3vw,42px);line-height:1.02;letter-spacing:-.04em;font-weight:400;margin:16px 0 10px
@@ -279,7 +279,7 @@ h1{
 }
 .question-number{
   width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(1,138,70,.42);color:var(--brand-green-light);font-size:10px;letter-spacing:.08em;margin-top:1px
+  border:1px solid rgba(8,139,73,.42);color:var(--brand-green-light);font-size:10px;letter-spacing:.08em;margin-top:1px
 }
 .question-content>label,.question-label{
   display:block;color:#fff;font-size:17px;font-weight:600;margin-bottom:6px
@@ -292,7 +292,7 @@ h1{
   color:#fff;padding:14px 15px;outline:none
 }
 .question-content>input[type="text"]:focus,.input-with-unit:focus-within{
-  border-color:rgba(1,138,70,.65);box-shadow:0 0 0 3px rgba(1,138,70,.08)
+  border-color:rgba(8,139,73,.65);box-shadow:0 0 0 3px rgba(8,139,73,.08)
 }
 .question-content>input::placeholder,.input-with-unit input::placeholder{color:#87939A}
 .mode-switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
@@ -308,8 +308,8 @@ h1{
   box-shadow:none;
 }
 .mode-btn:hover{
-  border-color:rgba(1,138,70,.55);
-  background:rgba(1,138,70,.06);
+  border-color:rgba(8,139,73,.55);
+  background:rgba(8,139,73,.06);
 }
 .mode-btn.active{
   color:#10231d;
@@ -343,10 +343,10 @@ h1{
 }
 .choice-card b{font-size:12px;color:#E3EAED}
 .choice-card small{font-size:10px;color:#8E9AA1;line-height:1.35}
-.choice-card:hover>span{border-color:rgba(1,138,70,.35);background:rgba(1,138,70,.045)}
+.choice-card:hover>span{border-color:rgba(8,139,73,.35);background:rgba(8,139,73,.045)}
 .choice-card input:checked+span{
-  border-color:rgba(1,138,70,.72);background:rgba(1,138,70,.10);
-  box-shadow:inset 0 0 0 1px rgba(1,138,70,.08)
+  border-color:rgba(8,139,73,.72);background:rgba(8,139,73,.10);
+  box-shadow:inset 0 0 0 1px rgba(8,139,73,.08)
 }
 .choice-card input:checked+span b{color:var(--brand-green-light)}
 .estimator-submit{width:100%;margin-top:26px;border:0;cursor:pointer}
@@ -357,16 +357,16 @@ h1{
 }
 .estimate-result:before{
   content:"";position:absolute;width:330px;height:330px;border-radius:50%;right:-145px;top:-130px;
-  background:radial-gradient(circle,rgba(1,138,70,.13),transparent 67%);pointer-events:none
+  background:radial-gradient(circle,rgba(8,139,73,.13),transparent 67%);pointer-events:none
 }
 .result-empty,.result-data{position:relative;z-index:1}
 .result-empty{min-height:540px;display:flex;flex-direction:column;justify-content:center}
 .result-orbit{
-  width:110px;height:110px;border:1px solid rgba(1,138,70,.28);border-radius:50%;
+  width:110px;height:110px;border:1px solid rgba(8,139,73,.28);border-radius:50%;
   margin-bottom:30px;position:relative
 }
 .result-orbit:before,.result-orbit:after{
-  content:"";position:absolute;border:1px solid rgba(1,138,70,.16);border-radius:50%
+  content:"";position:absolute;border:1px solid rgba(8,139,73,.16);border-radius:50%
 }
 .result-orbit:before{inset:12px}.result-orbit:after{inset:28px}
 .result-orbit span{position:absolute;width:10px;height:10px;background:var(--brand-green-light);border-radius:50%;top:16px;right:17px;box-shadow:0 0 24px rgba(121,216,181,.65)}
@@ -397,7 +397,7 @@ h1{
 .estimate-metrics strong{display:block;color:#fff;font-size:18px;letter-spacing:-.02em}
 .estimate-metrics small{display:block;color:#87939A;font-size:9px;margin-top:3px}
 .estimate-note{
-  border-left:2px solid rgba(1,138,70,.55);background:rgba(1,138,70,.055);
+  border-left:2px solid rgba(8,139,73,.55);background:rgba(8,139,73,.055);
   border-radius:0 12px 12px 0;padding:13px 14px;margin-top:18px
 }
 .estimate-note b{font-size:12px;color:var(--brand-green-light)}
@@ -412,8 +412,8 @@ h1{
   box-shadow:none;
 }
 .result-detail-btn:hover{
-  border-color:rgba(1,138,70,.60);
-  background:rgba(1,138,70,.07);
+  border-color:rgba(8,139,73,.60);
+  background:rgba(8,139,73,.07);
 }
 .needs-study{padding-top:70px}
 .needs-study .btn{margin-top:24px}
@@ -454,7 +454,7 @@ h1{
   border:1px solid var(--line);border-radius:18px;padding:18px 20px;cursor:pointer;
   background:rgba(255,255,255,.025);transition:.25s;
 }
-.step.active{border-color:rgba(1,138,70,.62);background:rgba(1,138,70,.08);transform:translateX(-6px)}
+.step.active{border-color:rgba(8,139,73,.62);background:rgba(8,139,73,.08);transform:translateX(-6px)}
 .step-top{display:flex;align-items:center;gap:14px}
 .step small{color:var(--brand-green)}
 .step h4{margin:0;font-size:18px}
@@ -566,7 +566,7 @@ h1{
 }
 .whatsapp-float:hover,
 .whatsapp-float:focus-visible{
-  background:#016F39;
+  background:#076F3B;
   box-shadow:0 16px 38px rgba(11,34,57,.28);
 }
 .whatsapp-float:hover span,
@@ -688,7 +688,7 @@ h1{
 .real-form-heading>span{
   width:28px;height:28px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(1,138,70,.42);
+  border:1px solid rgba(8,139,73,.42);
   color:var(--brand-green-light);font-size:9px;flex:0 0 auto;
 }
 .real-form-heading b{display:block;font-size:13px;color:#fff;margin-bottom:3px}
@@ -724,8 +724,8 @@ h1{
   box-shadow:none;
 }
 .advanced-data-toggle:hover{
-  border-color:rgba(1,138,70,.50);
-  background:rgba(1,138,70,.05);
+  border-color:rgba(8,139,73,.50);
+  background:rgba(8,139,73,.05);
 }
 .advanced-data-toggle span{display:block}
 .advanced-data-toggle b{display:block;font-size:12px}
@@ -758,8 +758,8 @@ h1{
   color:#fff;border-radius:10px;padding:11px 8px;min-height:44px;outline:none;
 }
 .monthly-grid input:focus{
-  border-color:rgba(1,138,70,.6);
-  box-shadow:0 0 0 3px rgba(1,138,70,.07);
+  border-color:rgba(8,139,73,.6);
+  box-shadow:0 0 0 3px rgba(8,139,73,.07);
 }
 .monthly-total{
   min-height:16px;
@@ -823,8 +823,8 @@ h1{
 .confidence-badge{
   font-size:13px;
   font-weight:700;
-  border-color:rgba(1,138,70,.30);
-  background:rgba(1,138,70,.08);
+  border-color:rgba(8,139,73,.30);
+  background:rgba(8,139,73,.08);
 }
 @media(max-width:640px){
   .real-data-panel{
@@ -1229,7 +1229,7 @@ h1{
 
   #proceso .step.active{
     padding:16px;
-    background:rgba(1,138,70,.07);
+    background:rgba(8,139,73,.07);
   }
 
   #proceso .step.active::before{
@@ -1241,7 +1241,7 @@ h1{
     background:
       linear-gradient(180deg,rgba(8,7,6,.04),rgba(8,7,6,.42)),
       var(--step-image) center/cover no-repeat;
-    border-bottom:1px solid rgba(1,138,70,.18);
+    border-bottom:1px solid rgba(8,139,73,.18);
   }
 
   #proceso .step.active p{
