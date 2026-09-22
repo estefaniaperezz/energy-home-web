@@ -49,11 +49,11 @@ document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
 
     // Mobile stops earlier so the panel sits below the header with a strip of hero still visible,
     // matching the intended editorial composition.
-    const revealProgress=isMobile ? .76 : .91;
+    const revealProgress=isMobile ? .59 : .91;
     const targetY=Math.max(0,storyTop+(storyTravel*revealProgress));
 
     history.replaceState(null,'','#servicios');
-    animatePageScroll(targetY,isMobile ? 1050 : 760);
+    animatePageScroll(targetY,isMobile ? 1200 : 760);
   });
 });
 
