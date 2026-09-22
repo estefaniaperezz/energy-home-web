@@ -592,8 +592,6 @@ h1{
   .saving-field-row{display:block}.saving-field select{width:100%;margin-top:10px}
   .saving-breakdown{grid-template-columns:1fr}
   .form{grid-template-columns:1fr}.contact-copy{padding:32px 20px}.contact-copy h2{font-size:44px}
-  .contact-direct{display:grid;grid-template-columns:1fr}
-  .contact-whatsapp,.contact-email-link{width:100%}
   .footer-in{align-items:flex-start;flex-direction:column;gap:16px}
   .whatsapp-float{
     top:auto;right:14px;bottom:18px;
