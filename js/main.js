@@ -93,6 +93,27 @@ document.querySelectorAll('a[href="#servicios"]').forEach(link=>{
 });
 
 
+const heritageSection=document.getElementById('historia');
+
+function updateHeritageMotion(){
+  if(!heritageSection) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    heritageSection.style.setProperty('--heritage-p','1');
+    return;
+  }
+
+  const rect=heritageSection.getBoundingClientRect();
+  const start=window.innerHeight*.88;
+  const end=window.innerHeight*.28;
+  const raw=Math.min(1,Math.max(0,(start-rect.top)/Math.max(1,start-end)));
+  const p=raw*raw*(3-2*raw);
+  heritageSection.style.setProperty('--heritage-p',p.toFixed(4));
+}
+
+addEventListener('scroll',updateHeritageMotion,{passive:true});
+addEventListener('resize',updateHeritageMotion);
+updateHeritageMotion();
+
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
     if(e.isIntersecting){e.target.classList.add('show');observer.unobserve(e.target)}
