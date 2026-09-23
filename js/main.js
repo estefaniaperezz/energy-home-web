@@ -155,57 +155,75 @@ if(projectCarousel){
   const slides=[...projectCarousel.querySelectorAll('[data-project-slide]')];
   const prev=projectCarousel.querySelector('[data-project-prev]');
   const next=projectCarousel.querySelector('[data-project-next]');
-  const current=projectCarousel.querySelector('[data-project-current]');
   let activeIndex=0;
-  let scrollTimer=null;
+  let touchStartX=null;
 
-  function updateProjectClasses(index){
+  function signedDeckDistance(index){
+    let distance=index-activeIndex;
+    const half=slides.length/2;
+    if(distance>half) distance-=slides.length;
+    if(distance<-half) distance+=slides.length;
+    return distance;
+  }
+
+  function updateProjectDeck(index){
     activeIndex=(index+slides.length)%slides.length;
+
     slides.forEach((slide,i)=>{
-      slide.classList.toggle('is-active',i===activeIndex);
-      const distance=Math.abs(i-activeIndex);
-      slide.classList.toggle('is-near',distance===1);
-      slide.setAttribute('aria-current',i===activeIndex?'true':'false');
+      const distance=signedDeckDistance(i);
+      slide.classList.remove(
+        'is-active','is-prev-1','is-next-1',
+        'is-prev-2','is-next-2','is-hidden'
+      );
+
+      if(distance===0) slide.classList.add('is-active');
+      else if(distance===-1) slide.classList.add('is-prev-1');
+      else if(distance===1) slide.classList.add('is-next-1');
+      else if(distance===-2) slide.classList.add('is-prev-2');
+      else if(distance===2) slide.classList.add('is-next-2');
+      else slide.classList.add('is-hidden');
+
+      slide.setAttribute('aria-current',distance===0?'true':'false');
+      slide.tabIndex=Math.abs(distance)<=2?0:-1;
     });
-    if(current) current.textContent=String(activeIndex+1).padStart(2,'0');
   }
 
-  function centerProjectSlide(index,behavior='smooth'){
-    const slide=slides[index];
-    if(!slide||!viewport) return;
-    updateProjectClasses(index);
-    const left=slide.offsetLeft-(viewport.clientWidth-slide.offsetWidth)/2;
-    viewport.scrollTo({left:Math.max(0,left),behavior});
+  function goToProject(index){
+    updateProjectDeck(index);
   }
 
-  function nearestProjectSlide(){
-    const center=viewport.scrollLeft+viewport.clientWidth/2;
-    let nearest=0;
-    let best=Infinity;
-    slides.forEach((slide,i)=>{
-      const slideCenter=slide.offsetLeft+slide.offsetWidth/2;
-      const distance=Math.abs(slideCenter-center);
-      if(distance<best){best=distance;nearest=i}
-    });
-    updateProjectClasses(nearest);
-  }
+  prev?.addEventListener('click',()=>goToProject(activeIndex-1));
+  next?.addEventListener('click',()=>goToProject(activeIndex+1));
 
-  prev?.addEventListener('click',()=>centerProjectSlide(activeIndex-1));
-  next?.addEventListener('click',()=>centerProjectSlide(activeIndex+1));
-  slides.forEach((slide,i)=>slide.addEventListener('click',()=>centerProjectSlide(i)));
-
-  viewport?.addEventListener('keydown',event=>{
-    if(event.key==='ArrowLeft'){event.preventDefault();centerProjectSlide(activeIndex-1)}
-    if(event.key==='ArrowRight'){event.preventDefault();centerProjectSlide(activeIndex+1)}
+  slides.forEach((slide,i)=>{
+    slide.addEventListener('click',()=>goToProject(i));
   });
 
-  viewport?.addEventListener('scroll',()=>{
-    clearTimeout(scrollTimer);
-    scrollTimer=setTimeout(nearestProjectSlide,90);
+  viewport?.addEventListener('keydown',event=>{
+    if(event.key==='ArrowLeft'){
+      event.preventDefault();
+      goToProject(activeIndex-1);
+    }
+    if(event.key==='ArrowRight'){
+      event.preventDefault();
+      goToProject(activeIndex+1);
+    }
+  });
+
+  viewport?.addEventListener('touchstart',event=>{
+    touchStartX=event.touches[0]?.clientX??null;
   },{passive:true});
 
-  addEventListener('resize',()=>centerProjectSlide(activeIndex,'auto'));
-  requestAnimationFrame(()=>centerProjectSlide(0,'auto'));
+  viewport?.addEventListener('touchend',event=>{
+    if(touchStartX===null) return;
+    const endX=event.changedTouches[0]?.clientX??touchStartX;
+    const delta=endX-touchStartX;
+    touchStartX=null;
+    if(Math.abs(delta)<38) return;
+    goToProject(activeIndex+(delta<0?1:-1));
+  },{passive:true});
+
+  updateProjectDeck(0);
 }
 
 
