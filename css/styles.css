@@ -225,6 +225,138 @@ h1{
 .service-body h3{font-size:19px;margin:7px 0}
 .service-body p{font-size:13px;line-height:1.45;color:#667178;margin-bottom:0}
 
+
+/* HERITAGE / STORY */
+.heritage-section{
+  position:relative;
+  z-index:11;
+  background:#fff;
+  color:var(--ink);
+  padding:104px 0 88px;
+  overflow:hidden;
+}
+.heritage-section::before{
+  content:"";
+  position:absolute;
+  width:460px;
+  height:460px;
+  border-radius:50%;
+  left:-260px;
+  top:40px;
+  background:radial-gradient(circle,rgba(15,76,129,.08),transparent 68%);
+  pointer-events:none;
+}
+.heritage-grid{
+  display:grid;
+  grid-template-columns:minmax(220px,.72fr) minmax(0,1.7fr);
+  gap:78px;
+  align-items:start;
+}
+.heritage-stat{
+  position:sticky;
+  top:126px;
+  padding-top:6px;
+}
+.heritage-stat strong{
+  display:flex;
+  align-items:flex-start;
+  font-size:clamp(86px,10vw,150px);
+  line-height:.78;
+  letter-spacing:-.075em;
+  font-weight:400;
+  color:var(--brand-blue);
+}
+.heritage-stat strong span{
+  color:var(--brand-green);
+  font-size:.42em;
+  line-height:1;
+  margin:.04em 0 0 .08em;
+}
+.heritage-stat p{
+  margin:24px 0 0;
+  color:#667178;
+  font-size:13px;
+  line-height:1.55;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+}
+.heritage-content h2{
+  font-size:clamp(34px,4.1vw,58px);
+  line-height:1.02;
+  letter-spacing:-.045em;
+  font-weight:400;
+  margin:10px 0 26px;
+  max-width:760px;
+}
+.heritage-copy{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:28px;
+  max-width:880px;
+}
+.heritage-copy p{
+  margin:0;
+  color:#667178;
+  font-size:14px;
+  line-height:1.75;
+}
+.heritage-path{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  margin-top:54px;
+  border-top:1px solid rgba(15,76,129,.16);
+}
+.heritage-step{
+  position:relative;
+  padding:28px 24px 4px 0;
+}
+.heritage-step::before{
+  content:"";
+  position:absolute;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  top:-5px;
+  left:0;
+  background:#fff;
+  border:2px solid var(--brand-green);
+  box-shadow:0 0 0 5px #fff;
+}
+.heritage-step small{
+  display:block;
+  color:var(--brand-green);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:9px;
+}
+.heritage-step b{
+  display:block;
+  font-size:15px;
+  color:var(--brand-dark);
+  margin-bottom:8px;
+}
+.heritage-step span{
+  display:block;
+  color:#7b858b;
+  font-size:11px;
+  line-height:1.55;
+  max-width:190px;
+}
+.heritage-quote{
+  margin:50px 0 0;
+  padding:0 0 0 24px;
+  border-left:2px solid var(--brand-green);
+  color:var(--brand-blue-deep);
+  font-size:clamp(18px,2vw,25px);
+  line-height:1.55;
+  font-weight:400;
+  max-width:820px;
+}
+
 /* NORMAL CONTINUATION */
 .after-story{
   background:#FFFFFF;
@@ -1491,4 +1623,41 @@ h1{
 .result-orbit span{
   background:#fff !important;
   box-shadow:0 0 24px rgba(255,255,255,.35) !important;
+}
+
+
+@media(max-width:900px){
+  .heritage-section{padding:78px 0 68px}
+  .heritage-grid{grid-template-columns:1fr;gap:38px}
+  .heritage-stat{position:relative;top:auto;display:flex;align-items:flex-end;gap:22px}
+  .heritage-stat strong{font-size:88px}
+  .heritage-stat p{margin:0 0 5px}
+  .heritage-copy{grid-template-columns:1fr;gap:14px}
+  .heritage-path{grid-template-columns:1fr 1fr;row-gap:18px}
+  .heritage-step:nth-child(3),
+  .heritage-step:nth-child(4){border-top:1px solid rgba(15,76,129,.10);padding-top:26px}
+  .heritage-step:nth-child(3)::before,
+  .heritage-step:nth-child(4)::before{display:none}
+}
+@media(max-width:560px){
+  .heritage-section{padding:68px 0 58px}
+  .heritage-stat{display:block}
+  .heritage-stat strong{font-size:82px}
+  .heritage-stat p{margin-top:18px}
+  .heritage-content h2{font-size:clamp(32px,9vw,40px)}
+  .heritage-path{grid-template-columns:1fr;margin-top:40px;border-top:0}
+  .heritage-step{
+    padding:18px 0 18px 26px;
+    border-top:1px solid rgba(15,76,129,.10);
+  }
+  .heritage-step::before,
+  .heritage-step:nth-child(3)::before,
+  .heritage-step:nth-child(4)::before{
+    display:block;
+    top:22px;
+    left:0;
+    box-shadow:none;
+  }
+  .heritage-step span{max-width:none}
+  .heritage-quote{margin-top:34px;font-size:18px}
 }
