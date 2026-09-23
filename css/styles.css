@@ -235,20 +235,15 @@ h1{
   padding:108px 0 98px;
   overflow:hidden;
 }
-.heritage-section::before{
-  content:"";
-  position:absolute;
-  width:520px;
-  height:520px;
-  border-radius:50%;
-  right:-280px;
-  top:-170px;
-  background:radial-gradient(circle,rgba(15,76,129,.07),transparent 68%);
-  pointer-events:none;
-}
+.heritage-section::before{display:none}
 .heritage-editorial{
   position:relative;
   max-width:1060px;
+}
+.heritage-editorial > .eyebrow{
+  font-size:14px;
+  letter-spacing:.11em;
+  font-weight:700;
 }
 .heritage-title{
   margin:12px 0 0;
@@ -280,7 +275,7 @@ h1{
 .heritage-secondary{
   max-width:610px;
   margin-top:18px;
-  font-size:14px;
+  font-size:16px;
 }
 .heritage-principle{
   margin:42px 0 0;
