@@ -192,3 +192,40 @@ Pruebas ejecutadas desde el entorno local con `node server.js`, conectando con N
 - En los casos anteriores se comprobó también el recálculo tras modificar datos sin necesidad de recargar la página.
 
 Esta evidencia complementa la auditoría automatizada con respuestas simuladas. Sigue pendiente el cierre de la Sección 11, el barrido de overflow y la regresión final completa después de los últimos fixes.
+
+## Auditoría final y endurecimiento — 23/09/2026
+
+### Resultado de la auditoría de Claude
+- Bloqueantes confirmados: **ninguno**.
+- Validación de ubicación, consumo, factura, orientación, perfil y sombras: **PASA** en los casos ejecutados.
+- Errores de servicio probados: geocodificación 404/5xx, PVGIS 5xx, JSON inválido, serie vacía y caída de red: **PASA**.
+- Recuperación tras error sin recargar: **PASA**.
+- Condición de carrera entre dos cálculos: **PASA**.
+- Doble clic rápido: **PASA**.
+- Enter envía: **PASA**.
+- `aria-invalid` se limpia al corregir: **PASA**.
+- Overflow horizontal en 360 / 390 / 768 / 1024 / 1440: **PASA**.
+
+### Incidencia "Consultando…" al editar durante una petición
+El informe de Claude detectó esta incidencia sobre una versión anterior del frontend. En el HEAD actual ya está corregida:
+
+- los estados de carga se etiquetan con `dataset.state='loading'`;
+- `clearEstimatorError()` limpia `error`, `loading` y `success`;
+- `handleEstimatorEdit()` invalida la petición pendiente, reactiva los botones, limpia el estado y elimina resultados anteriores.
+
+Por tanto, el fallo documentado queda **corregido en código** y debe incluirse como regresión específica en la siguiente ejecución automatizada/manual.
+
+### Endurecimiento adicional aplicado
+- Los formularios exponen `aria-busy="true"` durante una consulta y lo eliminan al terminar o invalidarse.
+- Los fallos recuperables de red/servicio ya no se registran como `console.error` en el navegador; se muestran exclusivamente mediante mensajes controlados para el usuario.
+- Se mantiene la protección de carrera por `estimateRunId`, de modo que una respuesta antigua no puede sobrescribir un cálculo más reciente.
+
+### Único cierre manual pendiente
+Antes de considerar cumplido literalmente el criterio de cierre de este documento, queda una ronda corta en **móvil real**:
+1. Camino feliz completo.
+2. Provocar un error de validación.
+3. Corregirlo y obtener resultado sin recargar.
+4. Editar un campo durante “Consultando…” y confirmar que el estado desaparece.
+5. Recorrido básico con Tab / controles nativos donde proceda.
+
+No se conocen fallos funcionales actuales en el motor. Esta ronda es verificación final de dispositivo, no una corrección pendiente conocida.
