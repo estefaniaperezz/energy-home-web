@@ -345,6 +345,11 @@ function estimatorValidationError(message,field=null){
 function setEstimatorBusy(busy){
   if(estimateButton) estimateButton.disabled=busy;
   if(realEstimateButton) realEstimateButton.disabled=busy;
+  [estimatorForm,realDataForm].forEach(form=>{
+    if(!form) return;
+    if(busy) form.setAttribute('aria-busy','true');
+    else form.removeAttribute('aria-busy');
+  });
 }
 
 function invalidatePendingEstimate(){
@@ -1102,7 +1107,6 @@ async function runSolarEstimate(options={}){
     }
   }catch(error){
     if(runId!==estimateRunId) return;
-    console.error(error);
     resetResultState();
     const rawMessage=error && error.message ? error.message : '';
     const message=/failed to fetch|networkerror|load failed|network request failed/i.test(rawMessage)
